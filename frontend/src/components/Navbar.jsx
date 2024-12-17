@@ -2,33 +2,31 @@ import React from "react";
 
 import { FaAngleDown } from "react-icons/fa6";
 import { CiHeart } from "react-icons/ci";
-
 import { IoNotificationsOutline } from "react-icons/io5";
 
 const Navbar = () => {
   return (
-    <div className="bg-[#F3F4F6] shadow-md px-24 py-4 flex items-center justify-between">
-      <div className="flex items-center gap-12">
-        <div className="bg-black px-8 py-3 text-white font-semibold rounded-md ">
+    <div className="bg-[#F3F4F6] relative z-50 shadow-md px-4 py-4 flex items-center justify-between sm:px-12 md:px-24">
+      <div className="flex items-center gap-4 sm:gap-12">
+        <div className="bg-black px-4 py-2 text-white font-semibold rounded-md text-sm sm:text-base">
           Ahen
         </div>
-        <div className="flex flex-col">
-          <p className="text-[#808080] text-xs uppercase self-end">Location</p>
-
+        <div className="flex flex-col items-end ">
+          <p className="text-[#808080] text-xs uppercase">Location</p>
           <div className="text-sm flex items-center gap-2">
             <p className="m-0">Majwade Thane</p>
             <FaAngleDown />
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-5 text-xl">
-        <CiHeart className="text-2xl" />
-        <IoNotificationsOutline />
 
+      <div className="flex items-center gap-3 md:gap-5 text-lg md:text-xl">
+        <CiHeart className="text-xl md:text-2xl" />
+        <IoNotificationsOutline className="text-xl md:text-2xl" />
         <img
           alt="profile"
           src={"https://via.placeholder.com/300"}
-          className="h-7 w-7 rounded-md"
+          className="h-7 w-7 rounded-md border-2 border-gray-300"
         />
       </div>
     </div>
