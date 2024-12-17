@@ -3,8 +3,16 @@ import React from "react";
 import { FaAngleDown } from "react-icons/fa6";
 import { CiHeart } from "react-icons/ci";
 import { IoNotificationsOutline } from "react-icons/io5";
+import { useDispatch } from "react-redux";
+import { toggleOpenWishlist } from "../redux/slices/wishlistSlice";
 
 const Navbar = () => {
+  const dispatch = useDispatch();
+
+  const handleOpenWishlist = () => {
+    dispatch(toggleOpenWishlist(true));
+  };
+
   return (
     <div className="bg-[#F3F4F6] relative z-50 shadow-md px-4 py-4 flex items-center justify-between sm:px-12 md:px-24">
       <div className="flex items-center gap-4 sm:gap-12">
@@ -21,7 +29,10 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-3 md:gap-5 text-lg md:text-xl">
-        <CiHeart className="text-xl md:text-2xl" />
+        <CiHeart
+          className="text-xl md:text-2xl cursor-pointer"
+          onClick={handleOpenWishlist}
+        />
         <IoNotificationsOutline className="text-xl md:text-2xl" />
         <img
           alt="profile"
