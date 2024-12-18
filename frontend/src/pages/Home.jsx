@@ -2,8 +2,8 @@ import React from "react";
 import Navbar from "../components/Navbar";
 
 import CourseBanner from "../components/Home/CourseBanner";
-import HomeCards from "../components/Home/HomeCards";
 import DiscountBanner from "../components/Home/DiscountBanner";
+import HomeCards from "../components/Home/HomeCards";
 import CourseCards from "./../components/Home/CourseCards";
 
 const Home = () => {

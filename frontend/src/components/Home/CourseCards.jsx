@@ -1,6 +1,7 @@
 import React from "react";
 import cardImage1 from "../../assets/images/homeCardImage.png";
 import { FaStar } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const CourseCards = () => {
   const data = [
@@ -30,11 +31,17 @@ const CourseCards = () => {
     },
   ];
 
+  const navigate = useNavigate();
+
   return (
     <div>
       <div className="mb-4 flex justify-between items-center">
         <p className="text-xl ">Courses</p>
-        <p className="text-xs text-[#8D8D8D]">View all</p>
+        <p
+          className="text-xs text-[#8D8D8D]"
+          onClick={() => navigate("/courses")}>
+          View all
+        </p>
       </div>
       <div className="flex flex-wrap gap-3 justify-between items-center">
         {data.slice(0, 4).map((info) => (
