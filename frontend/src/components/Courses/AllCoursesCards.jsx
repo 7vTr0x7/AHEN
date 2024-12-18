@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import CourseCard from "../CourseCard";
 
-const CourseCards = () => {
+const AllCourseCards = () => {
   const data = [
     {
       id: 1,
@@ -66,20 +66,13 @@ const CourseCards = () => {
     },
   ];
 
-  const navigate = useNavigate();
-
   return (
     <div>
       <div className="mb-4 flex justify-between items-center">
         <p className="text-xl ">Courses</p>
-        <p
-          className="text-xs text-[#8D8D8D]"
-          onClick={() => navigate("/courses")}>
-          View all
-        </p>
       </div>
-      <div className="flex flex-wrap gap-3 justify-between items-center">
-        {data.slice(0, 4).map((course) => (
+      <div className="flex flex-wrap gap-3  items-center">
+        {data.map((course) => (
           <div key={course.id}>
             <CourseCard course={course} />
           </div>
@@ -89,4 +82,4 @@ const CourseCards = () => {
   );
 };
 
-export default CourseCards;
+export default AllCourseCards;

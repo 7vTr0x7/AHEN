@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Courses from "./pages/Courses";
+import CourseDetails from "./components/Courses/CourseDetails";
 
 const App = () => {
   const isWishlistOpen = useSelector((state) => state.wishlist.isWishlistOpen);
@@ -18,6 +19,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/courses" element={<Courses />} />
+          <Route path="/courses/:course" element={<CourseDetails />} />
         </Routes>
       </Router>
 
