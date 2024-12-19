@@ -12,6 +12,8 @@ import CourseBanner from "../Home/CourseBanner";
 import UserProgressBanner from "./UserCourseDetails/UserProgressBanner";
 import { useSelector } from "react-redux";
 
+import DrivingReport from "./UserCourseDetails/DrivingReport";
+
 const UserCourseDetails = () => {
   const location = useLocation();
   const { course } = location.state;
@@ -95,17 +97,7 @@ const UserCourseDetails = () => {
           openIndex={openIndex}
         />
       </div>
-      {isReportOpen && (
-        <div className="overflow-hidden">
-          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"></div>
-
-          <div className="absolute z-50 w-[508px] h-[400px] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white shadow-lg">
-            <div className="relative">
-              <RxCross2 className="absolute right-3 top-3 text-xl cursor-pointer" />
-            </div>
-          </div>
-        </div>
-      )}
+      {isReportOpen && <DrivingReport />}
     </div>
   );
 };
