@@ -1,6 +1,6 @@
 import React from "react";
 
-const CourseImage = ({ course, image }) => (
+const UserCourseImage = ({ course, image }) => (
   <div className="bg-white rounded-lg flex-1 h-[95%] flex items-stretch">
     <img
       alt={course?.course}
@@ -10,4 +10,4 @@ const CourseImage = ({ course, image }) => (
   </div>
 );
 
-export default CourseImage;
+export default UserCourseImage;

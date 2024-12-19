@@ -19,8 +19,8 @@ const CourseDetails = () => {
   const [openIndex, setOpenIndex] = useState(null);
 
   const tabContent = {
-    about: "The Beginner Driving Course is designed for first-time drivers...",
-    reviews: "This course has great reviews! Students have given it 4.8/5.",
+    about:
+      "The Beginner Driving Course is designed for first-time drivers or those with minimal driving experience. Our certified instructors will guide you through every aspect of driving, from the fundamental vehicle controls to mastering road safety and traffic rules. By the end of this course, you'll gain the skills and confidence needed to drive independently and prepare for your driving test.",
   };
 
   const daysData = [
@@ -65,9 +65,11 @@ const CourseDetails = () => {
       <Navbar />
       <div className="px-4 sm:px-10 lg:px-24">
         <Breadcrumb />
-        <div className="flex md:flex-row flex-col mt-5 gap-5">
-          <CourseImage course={course} image={cardImage1} />
-          <div>
+        <div className="grid md:grid-cols-2 grid-cols-1 gap-5 mt-5">
+          <div className="md:col-span-1 col-span-2">
+            <CourseImage course={course} image={cardImage1} />
+          </div>
+          <div className="md:col-span-1 col-span-2">
             <CourseInfo course={course} />
             <SessionButtons />
             <hr className="w-[70%] my-6 h-[2px] bg-black" />

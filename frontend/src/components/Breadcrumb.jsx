@@ -19,6 +19,7 @@ const Breadcrumb = () => {
     label: formatPathPart(part), // Format each part
     href: "/" + pathParts.slice(0, index + 1).join("/"),
     isActive: index === pathParts.length - 1,
+    isUser: part === "user", // Check if part is 'user'
   }));
 
   return (
@@ -39,6 +40,11 @@ const Breadcrumb = () => {
             aria-current={item.isActive ? "page" : undefined}>
             {item.isActive ? (
               <>{item.label}</>
+            ) : item.label.toLowerCase() === "user" ? (
+              <>
+                <span className="text-black">{item.label}</span>
+                <span className="mx-2 text-gray-400">/</span>
+              </>
             ) : (
               <>
                 <Link
