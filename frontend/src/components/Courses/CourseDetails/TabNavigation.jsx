@@ -2,7 +2,7 @@ import React from "react";
 
 const TabNavigation = ({ activeTab, setActiveTab }) => (
   <div>
-    <div className="flex items-center gap-14 mt-5 text-sm text-[#616161] px-10">
+    <div className="flex items-center gap-14 mt-5 text-sm text-[#616161] px-10 select-none">
       <p
         className={`cursor-pointer ${
           activeTab === "about" ? "text-black font-bold" : ""
