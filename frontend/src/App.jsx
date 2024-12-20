@@ -6,7 +6,8 @@ import { useSelector } from "react-redux";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Courses from "./pages/Courses";
 import CourseDetails from "./components/Courses/CourseDetails";
-import UserCourseDetails from "./components/Courses/UserCourseDeatils";
+import UserCourseDetails from "./components/Courses/UserCourseDetails";
+import Session from "./components/Courses/UserCourseDetails/Session/Session";
 
 const App = () => {
   const isWishlistOpen = useSelector((state) => state.wishlist.isWishlistOpen);
@@ -22,6 +23,7 @@ const App = () => {
           <Route path="/courses" element={<Courses />} />
           <Route path="/courses/:course" element={<CourseDetails />} />
           <Route path="/courses/user/:course" element={<UserCourseDetails />} />
+          <Route path="/courses/user/:course/:session" element={<Session />} />
         </Routes>
       </Router>
 

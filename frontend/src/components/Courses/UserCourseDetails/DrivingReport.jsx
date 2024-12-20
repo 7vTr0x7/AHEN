@@ -10,7 +10,7 @@ const DrivingReport = () => {
 
   const isReportOpen = useSelector((state) => state.report.isReportOpen);
 
-  const handleOpenReport = () => {
+  const handleCloseReport = () => {
     dispatch(toggleOpenReport(false));
   };
 
@@ -34,13 +34,15 @@ const DrivingReport = () => {
     <>
       {isReportOpen && (
         <div>
-          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"></div>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
+            onClick={handleCloseReport}></div>
 
           <div className="absolute z-50 w-[500px] h-auto left-1/2 top-[70%] transform -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white shadow-lg">
             <div className="relative">
               <RxCross2
                 className="absolute right-3 top-3 text-xl cursor-pointer"
-                onClick={handleOpenReport}
+                onClick={handleCloseReport}
               />
             </div>
 

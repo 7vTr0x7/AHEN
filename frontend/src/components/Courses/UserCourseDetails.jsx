@@ -72,13 +72,13 @@ const UserCourseDetails = () => {
   return (
     <div className="bg-[#F3F4F6] pb-20">
       <Navbar />
-      <div className="px-4 sm:px-10 lg:px-24">
+      <div className="px-4 md:px-24">
         <Breadcrumb />
         <div className="grid md:grid-cols-2 grid-cols-1 gap-5 mt-5">
           <div className="md:col-span-1 col-span-2">
             <UserCourseImage course={course} image={cardImage1} />
           </div>
-          <div className="pl-8 pt-8 md:col-span-1 col-span-2">
+          <div className="md:pl-8 pt-8 md:col-span-1 col-span-2">
             <p className="text-xl font-medium">{course.course}</p>
             <p className="text-sm mt-1">{course.sessions} Session</p>
             <div className="mt-10">
@@ -91,6 +91,7 @@ const UserCourseDetails = () => {
 
         <UserTabContent
           activeTab={activeTab}
+          course={course.course}
           tabContent={tabContent}
           daysData={daysData}
           toggleDropdown={toggleDropdown}

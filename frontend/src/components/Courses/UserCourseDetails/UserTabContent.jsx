@@ -6,6 +6,7 @@ import { FaCheck } from "react-icons/fa6";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { useDispatch } from "react-redux";
 import { toggleOpenReport } from "../../../redux/slices/reportSlice";
+import { useNavigate } from "react-router-dom";
 
 const reviewsData = [
   {
@@ -36,12 +37,14 @@ const reviewsData = [
 
 const UserTabContent = ({
   activeTab,
+  course,
   tabContent,
   daysData,
   toggleDropdown,
   openIndex,
 }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleOpenReport = () => {
     dispatch(toggleOpenReport(true));
@@ -70,12 +73,25 @@ const UserTabContent = ({
           <span className="absolute left-[38px] top-14 h-2/5 border-l-[1px] border-black"></span>
         )}
         <div
-          className={`w-7 h-7 flex items-center justify-center text-gray-700 font-bold rounded-md mr-4 ${
-            lesson.completed ? "bg-black text-white" : "bg-gray-100"
-          }`}>
-          {lesson.completed ? <FaCheck /> : lesson.day}
+          className="flex items-center justify-center cursor-pointer"
+          onClick={() =>
+            navigate(
+              `/courses/user/${course
+                .split(":")[0]
+                .replace(" ", "-")}/${lesson.lesson
+                .toLowerCase()
+                .replace(" ", "-")}`,
+              { state: { lesson } }
+            )
+          }>
+          <div
+            className={`w-7 h-7 flex items-center justify-center  text-gray-700 font-bold rounded-md mr-4  ${
+              lesson.completed ? "bg-black text-white" : "bg-gray-100"
+            }`}>
+            {lesson.completed ? <FaCheck /> : lesson.day}
+          </div>
+          <p className="text-gray-700">{lesson.lesson}</p>
         </div>
-        <p className="text-gray-700">{lesson.lesson}</p>
         <div className="ml-auto pr-4">
           {lesson.completed ? (
             <button
