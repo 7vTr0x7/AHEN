@@ -13,6 +13,7 @@ import UserProgressBanner from "./UserCourseDetails/UserProgressBanner";
 import { useSelector } from "react-redux";
 
 import DrivingReport from "./UserCourseDetails/DrivingReport";
+import SessionBooking from "./UserCourseDetails/Session/SessionBooking";
 
 const UserCourseDetails = () => {
   const location = useLocation();
@@ -22,6 +23,9 @@ const UserCourseDetails = () => {
   const [openIndex, setOpenIndex] = useState(null);
 
   const isReportOpen = useSelector((state) => state.report.isReportOpen);
+  const isSessionBookingOpen = useSelector(
+    (state) => state.session.isSessionBookingOpen
+  );
 
   const tabContent = {
     about:
@@ -99,6 +103,8 @@ const UserCourseDetails = () => {
         />
       </div>
       {isReportOpen && <DrivingReport />}
+
+      {isSessionBookingOpen && <SessionBooking />}
     </div>
   );
 };

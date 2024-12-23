@@ -1,20 +1,25 @@
 import React, { useState } from "react";
-import Navbar from "../../../Navbar";
-import Breadcrumb from "../../../Breadcrumb";
 import drivingImage from "../../../../assets/images/driving.png";
-import SessionTabNavigation from "./SessionTabNavigation";
+import Breadcrumb from "../../../Breadcrumb";
+import Navbar from "../../../Navbar";
 import SessionTabContent from "./SessionTabContent";
+import SessionTabNavigation from "./SessionTabNavigation";
 
 import { CiCalendar } from "react-icons/ci";
-import { LuArrowRight } from "react-icons/lu";
 
 import { BsArrowRight } from "react-icons/bs";
+import SessionBooking from "./SessionBooking";
+import { useSelector } from "react-redux";
 
 const Session = () => {
   const [activeTab, setActiveTab] = useState("You'll learn");
 
+  const isSessionBookingOpen = useSelector(
+    (state) => state.session.isSessionBookingOpen
+  );
+
   return (
-    <div className="bg-[#F3F4F6] pb-20">
+    <div className="relative bg-[#F3F4F6] pb-20">
       <Navbar />
       <div className="px-4 sm:px-10 lg:px-24">
         <Breadcrumb />
@@ -42,7 +47,6 @@ const Session = () => {
           </div>
         </div>
       </div>
-      
     </div>
   );
 };

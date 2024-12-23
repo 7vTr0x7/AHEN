@@ -7,6 +7,7 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 import { useDispatch } from "react-redux";
 import { toggleOpenReport } from "../../../redux/slices/reportSlice";
 import { useNavigate } from "react-router-dom";
+import { toggleOpenSessionBooking } from "../../../redux/slices/sessionSlice";
 
 const reviewsData = [
   {
@@ -48,6 +49,9 @@ const UserTabContent = ({
 
   const handleOpenReport = () => {
     dispatch(toggleOpenReport(true));
+  };
+  const handleOpenSessionBooking = () => {
+    dispatch(toggleOpenSessionBooking(true));
   };
 
   const renderStars = (rating) => {
@@ -101,7 +105,9 @@ const UserTabContent = ({
               <p>View Report</p>
             </button>
           ) : bookSessionIndex === index ? (
-            <button className=" px-3 py-1 rounded-md text-[11px] bg-black text-white border border-black">
+            <button
+              className=" px-3 py-1 rounded-md text-[11px] bg-black text-white border border-black"
+              onClick={handleOpenSessionBooking}>
               <p>Schedule Session</p>
             </button>
           ) : null}
