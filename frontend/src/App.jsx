@@ -8,6 +8,7 @@ import Courses from "./pages/Courses";
 import CourseDetails from "./components/Courses/CourseDetails";
 import UserCourseDetails from "./components/Courses/UserCourseDetails";
 import Session from "./components/Courses/UserCourseDetails/Session/Session";
+import OngoingSession from "./components/Courses/UserCourseDetails/Session/OngoingSession/OngoingSession";
 
 const App = () => {
   const isWishlistOpen = useSelector((state) => state.wishlist.isWishlistOpen);
@@ -20,6 +21,7 @@ const App = () => {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/session" element={<OngoingSession />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/courses/:course" element={<CourseDetails />} />
           <Route path="/courses/user/:course" element={<UserCourseDetails />} />

@@ -6,6 +6,7 @@ const SessionSlice = createSlice({
     isSessionBookingOpen: false,
     isStartSessionOpen: false,
     isEndSessionOpen: false,
+    isRateInstructorOpen: false,
   },
   reducers: {
     toggleOpenSessionBooking: (state, action) => {
@@ -26,6 +27,12 @@ const SessionSlice = createSlice({
         isEndSessionOpen: action.payload,
       };
     },
+    toggleOpenRateInstructor: (state, action) => {
+      return {
+        ...state,
+        isRateInstructorOpen: action.payload,
+      };
+    },
   },
 });
 
@@ -33,6 +40,7 @@ export const {
   toggleOpenSessionBooking,
   toggleOpenStartSession,
   toggleOpenEndSession,
+  toggleOpenRateInstructor,
 } = SessionSlice.actions;
 
 export default SessionSlice.reducer;
