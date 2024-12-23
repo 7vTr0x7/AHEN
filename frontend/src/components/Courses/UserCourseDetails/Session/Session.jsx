@@ -9,14 +9,25 @@ import { CiCalendar } from "react-icons/ci";
 
 import { BsArrowRight } from "react-icons/bs";
 import SessionBooking from "./SessionBooking";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import StartSession from "./StartSession";
+import {
+  toggleOpenEndSession,
+  toggleOpenStartSession,
+} from "../../../../redux/slices/sessionSlice";
+import EndSession from "./EndSession";
 
 const Session = () => {
   const [activeTab, setActiveTab] = useState("You'll learn");
 
-  const isSessionBookingOpen = useSelector(
-    (state) => state.session.isSessionBookingOpen
-  );
+  const dispatch = useDispatch();
+
+  const handleOpenStartSession = () => {
+    dispatch(toggleOpenStartSession(true));
+  };
+  const handleOpenEndSession = () => {
+    dispatch(toggleOpenEndSession(true));
+  };
 
   return (
     <div className="relative bg-[#F3F4F6] pb-20">
@@ -37,6 +48,24 @@ const Session = () => {
                 <BsArrowRight className="text-lg font-light ml-5" />
               </button>
             </div>
+            <div className="flex items-center justify-end  mt-6 ">
+              <button
+                className="bg-black text-white flex items-center gap-2 px-4 py-3 rounded-lg"
+                onClick={handleOpenStartSession}>
+                <CiCalendar className="text-xl" />
+                <p className="text-sm">Start Session</p>
+                <BsArrowRight className="text-lg font-light ml-5" />
+              </button>
+            </div>
+            <div className="flex items-center justify-end  mt-6 ">
+              <button
+                className="bg-black text-white flex items-center gap-2 px-4 py-3 rounded-lg"
+                onClick={handleOpenEndSession}>
+                <CiCalendar className="text-xl" />
+                <p className="text-sm">End Session</p>
+                <BsArrowRight className="text-lg font-light ml-5" />
+              </button>
+            </div>
           </div>
           <div className="pl-2 md:col-span-1 col-span-2">
             <SessionTabNavigation
@@ -47,6 +76,8 @@ const Session = () => {
           </div>
         </div>
       </div>
+      <StartSession />
+      <EndSession />
     </div>
   );
 };
