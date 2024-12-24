@@ -36,7 +36,7 @@ const App = () => {
         </Routes>
       </Router>
 
-      <Wishlist />
+      {isWishlistOpen && <Wishlist />}
     </div>
   );
 };
