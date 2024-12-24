@@ -5,9 +5,12 @@ import { CiHeart } from "react-icons/ci";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { useDispatch } from "react-redux";
 import { toggleOpenWishlist } from "../redux/slices/wishlistSlice";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const dispatch = useDispatch();
+
+  const navigate = useNavigate();
 
   const handleOpenWishlist = () => {
     dispatch(toggleOpenWishlist(true));
@@ -16,7 +19,9 @@ const Navbar = () => {
   return (
     <div className="bg-[#F3F4F6] relative z-50 shadow-md px-4 py-4 flex items-center justify-between sm:px-12 md:px-24">
       <div className="flex items-center gap-4 sm:gap-12">
-        <div className="bg-black px-4 py-2 text-white font-semibold rounded-md text-sm sm:text-base">
+        <div
+          className="bg-black px-4 py-2 text-white font-semibold rounded-md text-sm sm:text-base cursor-pointer"
+          onClick={() => navigate("/")}>
           Ahen
         </div>
         <div className="flex flex-col items-end ">

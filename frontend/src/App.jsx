@@ -10,6 +10,10 @@ import UserCourseDetails from "./components/Courses/UserCourseDetails";
 import Session from "./components/Courses/UserCourseDetails/Session/Session";
 import OngoingSession from "./components/Courses/UserCourseDetails/Session/OngoingSession/OngoingSession";
 
+import DrivingLicense from "./Components/DrivingLicense/PageOne";
+import LicenseProgress from "./Components/LicenseProgress/LicenseProgress";
+import LearningLicense from "./Components/LearningLicense/PageOne";
+
 const App = () => {
   const isWishlistOpen = useSelector((state) => state.wishlist.isWishlistOpen);
 
@@ -26,6 +30,9 @@ const App = () => {
           <Route path="/courses/:course" element={<CourseDetails />} />
           <Route path="/courses/user/:course" element={<UserCourseDetails />} />
           <Route path="/courses/user/:course/:session" element={<Session />} />
+          <Route path="/driving-license" element={<DrivingLicense />} />
+          <Route path="/license-progress" element={<LicenseProgress />} />
+          <Route path="/learning-license" element={<LearningLicense />} />
         </Routes>
       </Router>
 
