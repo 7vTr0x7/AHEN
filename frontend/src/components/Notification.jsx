@@ -37,7 +37,7 @@ const Notification = () => {
       <div className="absolute top-[40px] bg-white shadow-lg p-4 w-[350px] md:w-[450px] right-[-30px] rounded-lg">
         <p className="text-sm font-semibold">Notifications</p>
         {notifications?.length > 0 ? (
-          <div className="py-5 max-h-[280px] overflow-y-auto ">
+          <div className="py-5 max-h-[280px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400">
             {notifications.map((notification, index) => (
               <div
                 key={index}
