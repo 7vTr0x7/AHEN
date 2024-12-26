@@ -13,6 +13,8 @@ import OngoingSession from "./components/Courses/UserCourseDetails/Session/Ongoi
 import DrivingLicense from "./Components/DrivingLicense/PageOne";
 import LicenseProgress from "./Components/LicenseProgress/LicenseProgress";
 import LearningLicense from "./Components/LearningLicense/PageOne";
+import PracticeDriving from "./pages/PracticeDriving";
+import DrivingDetails from "./components/PracticeDriving/DrivingDetails/DrivingDetails";
 
 const App = () => {
   const isWishlistOpen = useSelector((state) => state.wishlist.isWishlistOpen);
@@ -33,6 +35,11 @@ const App = () => {
           <Route path="/driving-license" element={<DrivingLicense />} />
           <Route path="/license-progress" element={<LicenseProgress />} />
           <Route path="/learning-license" element={<LearningLicense />} />
+          <Route path="/practice-driving" element={<PracticeDriving />} />
+          <Route
+            path="/practice-driving/:practice"
+            element={<DrivingDetails />}
+          />
         </Routes>
       </Router>
 

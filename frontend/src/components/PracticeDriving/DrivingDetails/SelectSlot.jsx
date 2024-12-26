@@ -1,10 +1,5 @@
 import React, { useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
-import { useDispatch } from "react-redux";
-import { toggleOpenSessionBooking } from "../../../../redux/slices/sessionSlice";
-import { IoIosInformationCircleOutline } from "react-icons/io";
-
-import drivingImg from "../../../../assets/images/drivingLessons.png";
 
 const days = [
   { id: 1, label: "Mon", date: 23 },
@@ -23,80 +18,33 @@ const timeSlots = [
   "05:00 PM - 07:00 PM",
 ];
 
-const SessionBooking = () => {
+const SelectSlot = ({ handleClose }) => {
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [selectedDuration, setSelectedDuration] = useState("1"); // New state for duration
-  const [isPriceVisible, setIsPriceVisible] = useState(false);
-  const [isFinalView, setIsFinalView] = useState(false);
-  const dispatch = useDispatch();
 
-  const handleClose = () => dispatch(toggleOpenSessionBooking(false));
-
-  const handleConfirmBooking = () => {
+  const handleBooking = () => {
     if (selectedDay && selectedTimeSlot) {
-      setIsPriceVisible(true);
+      console.log("");
     }
   };
-
-  const handleShowFinalView = () => {
-    setIsFinalView(true);
-  };
-
-  if (isFinalView) {
-    return (
-      <div>
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
-          onClick={handleClose}></div>
-
-        <div className="absolute z-50 w-[550px] left-1/2 top-2/4 transform -translate-x-1/2 -translate-y-1/2 rounded-lg shadow-lg">
-          <div className="flex flex-col items-center w-full bg-white rounded-lg shadow-md p-8 text-center relative">
-            <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
-              onClick={handleClose}>
-              <AiOutlineClose size={20} />
-            </button>
-            <img alt="driving" src={drivingImg} />
-            <h2 className="text-lg font-semibold mt-4">
-              Booking Confirmation!
-            </h2>
-            <p className="text-xs text-[#797979]">
-              Fasten your seat belts, your session is scheduled!
-            </p>
-            <div className="text-sm font-medium mt-4 flex items-center gap-2">
-              <p>Monday</p>
-              <p>23rd,</p>
-            </div>
-            <p className="text-sm font-medium ">{selectedTimeSlot}</p>
-
-            <button
-              className="mt-4 text-sm px-8 font-normal py-2 bg-black text-white rounded-lg"
-              onClick={() => dispatch(toggleOpenSessionBooking(false))}>
-              My Course
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div>
       <div
         className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
-        onClick={handleClose}></div>
+        onClick={() => handleClose(false)}></div>
 
       <div className="absolute z-50 w-[600px] left-1/2 top-2/4 transform -translate-x-1/2 -translate-y-1/2 rounded-lg shadow-lg">
         <div className="w-full bg-white rounded-lg shadow-md p-6 relative">
           <button
             className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
-            onClick={handleClose}>
+            onClick={() => handleClose(false)}>
             <AiOutlineClose size={20} />
           </button>
 
           <h2 className="text-center text-xl font-semibold mb-6">
-            Book Session
+            Select Slot
           </h2>
 
           <div className="mb-4">
@@ -175,33 +123,20 @@ const SessionBooking = () => {
             </div>
           </div>
 
-          <div className="mt-12 flex justify-end">
-            {!isPriceVisible ? (
+          {
+            <div className="mt-12 flex justify-end">
               <button
-                className="px-3 bg-black text-white py-2 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!selectedDay || !selectedTimeSlot}
-                onClick={handleConfirmBooking}>
+                className="px-3 bg-black text-white py-2 rounded-lg text-sm"
+                onClick={handleBooking}
+                disabled={!selectedDay || !selectedTimeSlot}>
                 Confirm Booking
               </button>
-            ) : (
-              <div className="flex flex-col gap-2">
-                <div className="text-[#767676] flex items-center gap-2">
-                  <IoIosInformationCircleOutline />
-                  <p className="text-xs">Pay once and avail discounts</p>
-                </div>
-                <button
-                  className="px-3 bg-black text-white py-2 flex gap-4 items-center rounded-lg text-sm"
-                  onClick={handleShowFinalView}>
-                  <span>Rs 250 /-</span>
-                  <span>Confirm Booking</span>
-                </button>
-              </div>
-            )}
-          </div>
+            </div>
+          }
         </div>
       </div>
     </div>
   );
 };
 
-export default SessionBooking;
+export default SelectSlot;
