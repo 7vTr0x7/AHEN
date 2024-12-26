@@ -16,14 +16,16 @@ import LicenseProgress from "./Components/LicenseProgress/LicenseProgress";
 import DrivingDetails from "./components/PracticeDriving/DrivingDetails/DrivingDetails";
 import Bookings from "./pages/Bookings";
 import PracticeDriving from "./pages/PracticeDriving";
+import Login from "./Auth/Login";
 
 const App = () => {
   const isWishlistOpen = useSelector((state) => state.wishlist.isWishlistOpen);
+  const isUserLoginOpen = useSelector((state) => state.user.isUserLoginOpen);
 
   return (
     <div
       className={`font-aeonik relative h-screen ${
-        isWishlistOpen ? "overflow-hidden" : ""
+        isWishlistOpen || isUserLoginOpen ? "overflow-hidden" : ""
       }`}>
       <Router>
         <Routes>
@@ -46,6 +48,7 @@ const App = () => {
       </Router>
 
       {isWishlistOpen && <Wishlist />}
+      {isUserLoginOpen && <Login />}
     </div>
   );
 };

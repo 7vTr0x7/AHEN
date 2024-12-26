@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { IoNotifications } from "react-icons/io5";
 import { toggleOpenNotification } from "../redux/slices/notificationSlice";
 import Notification from "./Notification";
+import { toggleOpenUserLogin } from "../redux/slices/userSlice";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -25,6 +26,9 @@ const Navbar = () => {
 
   const openNotificationHandler = () => {
     dispatch(toggleOpenNotification(true));
+  };
+  const openLoginHandler = () => {
+    dispatch(toggleOpenUserLogin(true));
   };
   const closeNotificationHandler = () => {
     dispatch(toggleOpenNotification(false));
@@ -71,6 +75,7 @@ const Navbar = () => {
             alt="profile"
             src={"https://via.placeholder.com/300"}
             className="h-7 w-7 rounded-md border-2 border-gray-300"
+            onClick={openLoginHandler}
           />
         </div>
       </div>

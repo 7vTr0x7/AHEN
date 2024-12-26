@@ -14,9 +14,11 @@ const Wishlist = () => {
 
   return (
     <div
-      className={`absolute  right-0 top-0 h-full z-50 w-96 px-5 bg-white shadow-lg transform transition-transform duration-300 ease-in-out rounded-lg ${
-        isWishlistOpen ? "translate-x-0" : "translate-x-full"
-      }`}>
+      className={`fixed right-0 top-0 h-full z-50 w-96 px-5 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${
+        isWishlistOpen
+          ? "translate-x-0 opacity-100"
+          : "translate-x-full opacity-0"
+      } rounded-lg`}>
       <div className="flex items-center w-full relative">
         <LuArrowLeft
           className="absolute left-0 text-xl cursor-pointer"
