@@ -10,9 +10,9 @@ import OngoingSession from "./components/Courses/UserCourseDetails/Session/Ongoi
 import Session from "./components/Courses/UserCourseDetails/Session/Session";
 import Courses from "./pages/Courses";
 
-import DrivingLicense from "./Components/DrivingLicense/PageOne";
-import LearningLicense from "./Components/LearningLicense/PageOne";
-import LicenseProgress from "./Components/LicenseProgress/LicenseProgress";
+import DrivingLicense from "./components/DrivingLicense/PageOne";
+import LearningLicense from "./components/LearningLicense/PageOne";
+import LicenseProgress from "./components/LicenseProgress/LicenseProgress";
 import DrivingDetails from "./components/PracticeDriving/DrivingDetails/DrivingDetails";
 import Bookings from "./pages/Bookings";
 import PracticeDriving from "./pages/PracticeDriving";
