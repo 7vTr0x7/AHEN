@@ -18,11 +18,6 @@ const CourseDetails = () => {
   const [activeTab, setActiveTab] = useState("courseContent");
   const [openIndex, setOpenIndex] = useState(null);
 
-  const tabContent = {
-    about:
-      "The Beginner Driving Course is designed for first-time drivers or those with minimal driving experience. Our certified instructors will guide you through every aspect of driving, from the fundamental vehicle controls to mastering road safety and traffic rules. By the end of this course, you'll gain the skills and confidence needed to drive independently and prepare for your driving test.",
-  };
-
   const daysData = [
     {
       title: "Day 1 to 10",
@@ -74,7 +69,7 @@ const CourseDetails = () => {
             <SessionButtons />
             <hr className="w-[70%] my-6 h-[2px] bg-black" />
 
-            <PaymentButtons />
+            <PaymentButtons course={course} />
           </div>
         </div>
 
@@ -82,7 +77,7 @@ const CourseDetails = () => {
 
         <TabContent
           activeTab={activeTab}
-          tabContent={tabContent}
+          course={course}
           daysData={daysData}
           toggleDropdown={toggleDropdown}
           openIndex={openIndex}

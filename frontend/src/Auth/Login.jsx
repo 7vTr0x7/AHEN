@@ -2,15 +2,18 @@ import React, { useState } from "react";
 import { LuArrowLeft } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleOpenUserLogin } from "../redux/slices/userSlice";
-// Import FontAwesome components
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGoogle, faFacebook } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle, faFacebook } from "@fortawesome/free-brands-svg-icons";
+import toast, { Toaster } from "react-hot-toast";
 import loginImg from "../assets/images/loginImg.png";
 
 const Login = () => {
   const dispatch = useDispatch();
   const isUserLoginOpen = useSelector((state) => state.user.isUserLoginOpen);
   const [isSignup, setIsSignup] = useState(false);
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [acceptTerms, setAcceptTerms] = useState(false); // Separate state for terms
+  const [error, setError] = useState("");
 
   const handleOpenLogin = () => {
     dispatch(toggleOpenUserLogin(false));
@@ -18,16 +21,72 @@ const Login = () => {
 
   const toggleForm = () => {
     setIsSignup((prev) => !prev);
+    setFormData({ email: "", password: "" }); // Reset form data on toggle
+    setAcceptTerms(false); // Reset terms on toggle
+    setError(""); // Clear error on toggle
+  };
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (isSignup && !acceptTerms) {
+      toast.error("You must accept the terms and conditions.");
+      return;
+    }
+
+    const toastId = toast.loading(isSignup ? "Signing up..." : "Logging in...");
+    const url = isSignup
+      ? "http://localhost:3000/api/users/signup"
+      : "http://localhost:3000/api/users/login";
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const message = await response.json();
+        throw new Error(message.error || "Something went wrong");
+      }
+
+      const data = await response.json();
+
+    
+      toast.success(isSignup ? "Signup successful!" : "Login successful!", {
+        id: toastId,
+      });
+      if (isSignup) {
+      setIsSignup(false);
+      setFormData({ email: "", password: "" }); 
+    } else {
+      localStorage.setItem("token", data?.token)
+      
+      handleOpenLogin(); 
+    }
+    } catch (err) {
+      toast.error(err.message, { id: toastId });
+    } finally {
+      toast.dismiss(toastId);
+    }
   };
 
   return (
     <div
-      className={`fixed right-0 top-0 h-full overflow-y-auto z-50 w-96 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${
+      className={`fixed right-0 top-0 h-full overflow-y-auto z-50 w-72 md:w-96 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${
         isUserLoginOpen
           ? "translate-x-0 opacity-100"
           : "translate-x-full opacity-0"
       } rounded-2xl`}
     >
+      <Toaster />
       <div className="pt-4 px-5 pb-2">
         <LuArrowLeft
           className="text-xl cursor-pointer"
@@ -42,7 +101,7 @@ const Login = () => {
         <p className="text-lg font-medium text-gray-700 mb-6">
           {isSignup ? "Sign Up" : "Sign In"}
         </p>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -53,8 +112,11 @@ const Login = () => {
             <input
               type="email"
               id="email"
+              value={formData.email}
+              onChange={handleInputChange}
               placeholder="someone@gmail.com"
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              required
             />
           </div>
           <div className="mb-4">
@@ -67,8 +129,11 @@ const Login = () => {
             <input
               type="password"
               id="password"
+              value={formData.password}
+              onChange={handleInputChange}
               placeholder={isSignup ? "Create password" : "Enter your password"}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              required
             />
           </div>
           {isSignup && (
@@ -76,6 +141,8 @@ const Login = () => {
               <input
                 type="checkbox"
                 id="terms"
+                checked={acceptTerms}
+                onChange={(e) => setAcceptTerms(e.target.checked)}
                 className="w-4 h-4 mt-1 text-blue-500 border-gray-300 rounded focus:ring-blue-400"
               />
               <label
@@ -132,6 +199,7 @@ const Login = () => {
           )}
         </p>
       </div>
+      
     </div>
   );
 };

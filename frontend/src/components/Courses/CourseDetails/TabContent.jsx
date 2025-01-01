@@ -31,7 +31,7 @@ const reviewsData = [
 
 const TabContent = ({
   activeTab,
-  tabContent,
+  course,
   daysData,
   toggleDropdown,
   openIndex,
@@ -103,7 +103,7 @@ const TabContent = ({
           </div>
         ) : (
           <div className="bg-white p-4 shadow-lg rounded-md">
-            <p>{tabContent[activeTab]}</p>
+            <p>{course.about}</p>
           </div>
         )}
       </div>

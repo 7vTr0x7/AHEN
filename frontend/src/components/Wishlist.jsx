@@ -14,7 +14,7 @@ const Wishlist = () => {
 
   return (
     <div
-      className={`fixed right-0 top-0 h-full z-50 w-96 px-5 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${
+      className={`fixed right-0 top-0 h-full z-50 w-72 md:w-96 px-5 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${
         isWishlistOpen
           ? "translate-x-0 opacity-100"
           : "translate-x-full opacity-0"
