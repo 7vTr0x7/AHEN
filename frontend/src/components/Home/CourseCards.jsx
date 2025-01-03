@@ -14,8 +14,8 @@ const CourseCards = () => {
       }
 
       const data = await res.json();
-      if (data?.courses?.length > 0) {
-        setCourses(data.courses);
+      if (data?.data?.length > 0) {
+        setCourses(data.data);
       }
     } catch (error) {
       console.log("Error occurred while fetch session");

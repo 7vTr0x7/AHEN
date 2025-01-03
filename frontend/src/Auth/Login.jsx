@@ -59,18 +59,24 @@ const Login = () => {
 
       const data = await response.json();
 
-    
       toast.success(isSignup ? "Signup successful!" : "Login successful!", {
         id: toastId,
       });
       if (isSignup) {
-      setIsSignup(false);
-      setFormData({ email: "", password: "" }); 
-    } else {
-      localStorage.setItem("token", data?.token)
-      
-      handleOpenLogin(); 
-    }
+        setIsSignup(false);
+        setFormData({ email: "", password: "" });
+      } else {
+        const token = data?.token;
+        const expirationTime = new Date().getTime() + 60 * 60 * 1000;
+        localStorage.setItem(
+          "token",
+          JSON.stringify({ value: token, expiry: expirationTime })
+        );
+
+        localStorage.setItem("user_id", data?.userId);
+
+        handleOpenLogin();
+      }
     } catch (err) {
       toast.error(err.message, { id: toastId });
     } finally {
@@ -84,8 +90,7 @@ const Login = () => {
         isUserLoginOpen
           ? "translate-x-0 opacity-100"
           : "translate-x-full opacity-0"
-      } rounded-2xl`}
-    >
+      } rounded-2xl`}>
       <Toaster />
       <div className="pt-4 px-5 pb-2">
         <LuArrowLeft
@@ -105,8 +110,7 @@ const Login = () => {
           <div className="mb-4">
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-600 mb-2"
-            >
+              className="block text-sm font-medium text-gray-600 mb-2">
               Email ID
             </label>
             <input
@@ -122,8 +126,7 @@ const Login = () => {
           <div className="mb-4">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-600 mb-2"
-            >
+              className="block text-sm font-medium text-gray-600 mb-2">
               Password
             </label>
             <input
@@ -147,16 +150,14 @@ const Login = () => {
               />
               <label
                 htmlFor="terms"
-                className="ml-2 text-xs text-gray-600 leading-4"
-              >
+                className="ml-2 text-xs text-gray-600 leading-4">
                 Accept terms and Conditions
               </label>
             </div>
           )}
           <button
             type="submit"
-            className="w-full py-3 bg-black text-white font-medium text-sm rounded-lg hover:bg-gray-800 transition"
-          >
+            className="w-full py-3 bg-black text-white font-medium text-sm rounded-lg hover:bg-gray-800 transition">
             {isSignup ? "Sign Up" : "Login"}
           </button>
         </form>
@@ -181,8 +182,7 @@ const Login = () => {
               Already have an account?{" "}
               <span
                 className="text-blue-500 font-medium cursor-pointer"
-                onClick={toggleForm}
-              >
+                onClick={toggleForm}>
                 Login
               </span>
             </>
@@ -191,15 +191,13 @@ const Login = () => {
               Don't have an account?{" "}
               <span
                 className="text-blue-500 font-medium cursor-pointer"
-                onClick={toggleForm}
-              >
+                onClick={toggleForm}>
                 Sign Up
               </span>
             </>
           )}
         </p>
       </div>
-      
     </div>
   );
 };

@@ -10,13 +10,13 @@ const HomeCards = () => {
     },
     {
       id: "2",
-      title: "Driving Zero to Hero",
-      des: "Learn driving right from basics & become a Master.",
+      title: "Licensing",
+      des: "Get your driving license at the comfort of your home.",
     },
     {
       id: "3",
-      title: "Driving Zero to Hero",
-      des: "Learn driving right from basics & become a Master.",
+      title: "Practice driving",
+      des: "Get hands on experience on a vehicle & sharpen your skills.",
     },
   ];
 

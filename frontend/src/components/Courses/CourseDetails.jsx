@@ -18,39 +18,6 @@ const CourseDetails = () => {
   const [activeTab, setActiveTab] = useState("courseContent");
   const [openIndex, setOpenIndex] = useState(null);
 
-  const daysData = [
-    {
-      title: "Day 1 to 10",
-      lessons: [
-        { day: "1", lesson: "Introduction to React" },
-        { day: "2", lesson: "Understanding Components" },
-        { day: "3", lesson: "State and Props in React" },
-        { day: "4", lesson: "Event Handling in React" },
-        { day: "5", lesson: "React Lifecycle Methods" },
-        { day: "6", lesson: "Building a To-Do App" },
-        { day: "7", lesson: "Introduction to Hooks" },
-        { day: "8", lesson: "useState Hook Practice" },
-        { day: "9", lesson: "useEffect in React" },
-        { day: "10", lesson: "Practice Session 1" },
-      ],
-    },
-    {
-      title: "Day 11 to 20",
-      lessons: [
-        { day: "11", lesson: "React Router Introduction" },
-        { day: "12", lesson: "Navigation & Routes" },
-        { day: "13", lesson: "Dynamic Routing" },
-        { day: "14", lesson: "API Integration with React" },
-        { day: "15", lesson: "Axios for Fetching Data" },
-        { day: "16", lesson: "Custom Hooks" },
-        { day: "17", lesson: "State Management with Context API" },
-        { day: "18", lesson: "Error Handling in React" },
-        { day: "19", lesson: "Optimizing React Apps" },
-        { day: "20", lesson: "Practice Session 2" },
-      ],
-    },
-  ];
-
   const toggleDropdown = (index) => {
     setOpenIndex((prevIndex) => (prevIndex === index ? null : index));
   };
@@ -78,7 +45,6 @@ const CourseDetails = () => {
         <TabContent
           activeTab={activeTab}
           course={course}
-          daysData={daysData}
           toggleDropdown={toggleDropdown}
           openIndex={openIndex}
         />

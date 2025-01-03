@@ -1,73 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Breadcrumb from "../components/Breadcrumb";
 
 const Bookings = () => {
-  const bookings = [
-    {
-      id: "AHEN00001458",
-      car: "Jeep Wrangler",
-      type: "Hatchback",
-      duration: "60 min",
-      bookingDate: "Monday 23, 2024",
-      slotDate: "Monday 24, 2024",
-      slotTime: "2:00 AM - 02:00 PM",
-      status: "Pending",
-      amount: 449,
-      tax: 50,
-      total: 499,
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: "AHEN00001408",
-      car: "Jeep Wrangler",
-      type: "Hatchback",
-      duration: "60 min",
-      bookingDate: "Monday 23, 2024",
-      slotDate: "Monday 24, 2024",
-      slotTime: "2:00 AM - 02:00 PM",
-      status: "Upcoming",
-      amount: 449,
-      tax: 50,
-      total: 499,
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: "AHEN00001459",
-      car: "Tesla Model X",
-      type: "SUV",
-      duration: "45 min",
-      bookingDate: "Tuesday 24, 2024",
-      slotDate: "Wednesday 25, 2024",
-      slotTime: "10:00 AM - 12:00 PM",
-      status: "Completed",
-      amount: 999,
-      tax: 100,
-      total: 1099,
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: "AHEN00001460",
-      car: "Ford Mustang",
-      type: "Convertible",
-      duration: "30 min",
-      bookingDate: "Friday 26, 2024",
-      slotDate: "Saturday 27, 2024",
-      slotTime: "4:00 PM - 5:00 PM",
-      status: "Canceled",
-      amount: 599,
-      tax: 70,
-      total: 669,
-      image: "https://via.placeholder.com/150",
-    },
-  ];
-
+  const [bookings, setBookings] = useState([]);
   const [filter, setFilter] = useState("All");
+
+  useEffect(() => {
+    // Fetch bookings data
+    const fetchBookings = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/api/get-all-bookings"
+        );
+        const data = await response.json();
+        if (data.message === "Bookings fetched successfully") {
+          setBookings(data.bookings);
+        }
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+      }
+    };
+
+    fetchBookings();
+  }, []);
 
   const filteredBookings =
     filter === "All"
       ? bookings
-      : bookings.filter((booking) => booking.status === filter);
+      : bookings.filter((booking) => booking.status === filter.toLowerCase());
 
   return (
     <div className="bg-[#F3F4F6] pb-20 h-auto">
@@ -102,45 +63,53 @@ const Bookings = () => {
                 <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200">
                   <div className="flex items-start mb-4 border-b pb-4">
                     <img
-                      src={booking.image}
-                      alt={booking.car}
+                      src="https://via.placeholder.com/150" // Add the appropriate image URL here
+                      alt="Car"
                       className="rounded-md w-28 h-20 object-cover mr-4"
                     />
                     <div className="pt-4">
                       <h2 className="text-base font-bold mb-1">
-                        {booking.car}
+                        {booking.course_id}{" "}
+                        {/* Replace with actual course name if available */}
                       </h2>
-                      <p className="text-gray-500 text-xs">{booking.type}</p>
+                      <p className="text-gray-500 text-xs">
+                        {booking.slot_time}
+                      </p>
                     </div>
                   </div>
                   <div className="text-xs space-y-1 border-b pb-4">
                     <div className="flex justify-between">
                       <span className="font-medium">Booking Date</span>
-                      <span>{booking.bookingDate}</span>
+                      <span>
+                        {new Date(booking.booking_date).toLocaleDateString()}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="font-medium">Booking ID</span>
-                      <span>{booking.id}</span>
+                      <span>{booking.booking_id || "N/A"}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="font-medium">Slot Date</span>
-                      <span>{booking.slotDate}</span>
+                      <span>
+                        {new Date(booking.slot_date).toLocaleDateString()}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="font-medium">Slot Time</span>
-                      <span>{booking.slotTime}</span>
+                      <span>{booking.slot_time}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="font-medium">Status</span>
                       <span
                         className={`${
-                          booking.status === "Pending"
+                          booking.status === "pending"
                             ? "text-yellow-500"
-                            : booking.status === "Completed"
+                            : booking.status === "completed"
                             ? "text-green-500"
                             : "text-red-500"
                         }`}>
-                        {booking.status}
+                        {booking.status.charAt(0).toUpperCase() +
+                          booking.status.slice(1)}
                       </span>
                     </div>
                   </div>
@@ -149,17 +118,9 @@ const Bookings = () => {
                       <span className="font-medium">Amount</span>
                       <span>Rs {booking.amount}</span>
                     </div>
-                    <div className="flex justify-between border-b pb-2">
-                      <span className="font-medium">Tax & Fees</span>
-                      <span>Rs {booking.tax}</span>
-                    </div>
-                    <div className="flex justify-between text-sm font-bold">
-                      <span>Total</span>
-                      <span>Rs {booking.total}</span>
-                    </div>
                   </div>
                 </div>
-                {booking.status === "Upcoming" && (
+                {booking.status === "pending" && (
                   <div className="flex justify-end mt-2">
                     <button className="border border-black text-xs px-4 py-1 rounded-lg">
                       Cancel Booking

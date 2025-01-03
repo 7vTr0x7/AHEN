@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { FaAngleDown } from "react-icons/fa6";
 import { CiHeart } from "react-icons/ci";
@@ -13,7 +13,7 @@ import { toggleOpenUserLogin } from "../redux/slices/userSlice";
 import { getToken } from "../../utils/constants";
 
 const Navbar = () => {
-  const [isBoxOpen, setIsBoxOpen] = useState(false); 
+  const [isBoxOpen, setIsBoxOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = getToken();
@@ -21,6 +21,65 @@ const Navbar = () => {
   const isNotificationOpen = useSelector(
     (state) => state.notification.isNotificationOpen
   );
+
+
+const [location, setLocation] = useState({ city: "", town: "" });
+const [error, setError] = useState("");
+
+const fetchLocationDetails = async (lat, lon) => {
+  const API_KEY = import.meta.env.VITE_MAP_API; // Replace with your API key
+  try {
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${API_KEY}`
+    );
+    const data = await response.json();
+
+    if (data.status === "OK" && data.results.length > 0) {
+      const addressComponents = data.results[0].address_components;
+
+      // Extract city and town from address components
+      let city = "Unknown";
+      let town = "Unknown";
+
+      addressComponents.forEach((component) => {
+        if (component.types.includes("locality")) {
+          city = component.long_name;
+        } else if (component.types.includes("sublocality") || component.types.includes("administrative_area_level_2")) {
+          town = component.long_name;
+        }
+      });
+
+      setLocation({ city, town });
+      setError("");
+    } else {
+      setError("Unable to fetch location details.");
+    }
+  } catch {
+    setError("An error occurred while fetching location details.");
+  }
+};
+
+const getLocation = () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        fetchLocationDetails(latitude, longitude);
+      },
+      () => {
+        setError("Failed to get location. Please enable location services.");
+      }
+    );
+  } else {
+    setError("Geolocation is not supported by this browser.");
+  }
+};
+
+useEffect(() => {
+  getLocation();
+}, []);
+
+
 
   const handleOpenWishlist = () => {
     dispatch(toggleOpenWishlist(true));
@@ -49,7 +108,7 @@ const Navbar = () => {
             <div className="flex flex-col items-end ">
               <p className="text-[#808080] text-xs uppercase">Location</p>
               <div className="text-sm flex items-center gap-2">
-                <p className="m-0">Majwade Thane</p>
+                <p className="m-0">{location.city} {location.town}</p>
                 <FaAngleDown />
               </div>
             </div>
@@ -89,30 +148,49 @@ const Navbar = () => {
                 onClick={() => setIsBoxOpen(!isBoxOpen)} // Toggle dropdown visibility
               />
 
-              {/* Dropdown Box */}
               {isBoxOpen && (
                 <div className="absolute right-0 mt-2 bg-white shadow-lg p-4 w-48 z-50 border rounded-md">
-                
-                  <div className="mt-2 cursor-pointer" onClick={() => navigate("/courses")}>
+                  <div
+                    className="mt-2 cursor-pointer"
+                    onClick={() => navigate("/profile")}>
+                    <div className="text-sm font-semibold">Profile</div>
+                  </div>
+                  <div
+                    className="mt-2 cursor-pointer"
+                    onClick={() => navigate("/courses")}>
                     <div className="text-sm font-semibold">Courses</div>
                   </div>
 
-                                   <div className="mt-2 cursor-pointer" onClick={() => navigate("/driving-license")}>
-
+                  <div
+                    className="mt-2 cursor-pointer"
+                    onClick={() => navigate("/driving-license")}>
                     <div className="text-sm font-semibold">License</div>
-                    <div className="text-xs text-gray-500">Standard License</div>
+                    <div className="text-xs text-gray-500">
+                      Standard License
+                    </div>
                   </div>
-               <div className="mt-2 cursor-pointer" onClick={() => navigate("/learning-license")}>
+                  <div
+                    className="mt-2 cursor-pointer"
+                    onClick={() => navigate("/learning-license")}>
                     <div className="text-sm font-semibold">License</div>
-                    <div className="text-xs text-gray-500">Learning License</div>
+                    <div className="text-xs text-gray-500">
+                      Learning License
+                    </div>
                   </div>
-               <div className="mt-2 cursor-pointer" onClick={() => navigate("/license-progress")}>
-                    <div className="text-sm font-semibold">License Progress</div>
-                    <div className="text-xs text-gray-500">License Progress</div>
+                  <div
+                    className="mt-2 cursor-pointer"
+                    onClick={() => navigate("/license-progress")}>
+                    <div className="text-sm font-semibold">
+                      License Progress
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      License Progress
+                    </div>
                   </div>
 
-                                <div className="mt-2 cursor-pointer" onClick={() => navigate("/bookings")}>
-
+                  <div
+                    className="mt-2 cursor-pointer"
+                    onClick={() => navigate("/bookings")}>
                     <div className="text-sm font-semibold">Bookings</div>
                   </div>
                 </div>

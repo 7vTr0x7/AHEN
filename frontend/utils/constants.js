@@ -1,3 +1,14 @@
+export const getToken = () => {
+  const tokenString = localStorage.getItem("token");
+  if (!tokenString) return null;
 
+  const { value, expiry } = JSON.parse(tokenString);
+  const now = new Date().getTime();
 
-export const getToken = () => localStorage.getItem("token")
+  if (now > expiry) {
+    localStorage.removeItem("token");
+    return null;
+  }
+
+  return value;
+};

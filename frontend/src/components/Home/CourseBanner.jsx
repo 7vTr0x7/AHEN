@@ -30,7 +30,7 @@ const CourseBanner = ({ upcomingSession, message }) => {
             </div>
           </div>
         ) : (
-          <p>{message}</p>
+          <p className="text-black">{`No upcoming session`}</p>
         )}
       </div>
       <hr className="mt-5 h-[2px] bg-[#C9C9C9] border-0" />

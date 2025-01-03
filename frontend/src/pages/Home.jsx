@@ -5,6 +5,7 @@ import CourseBanner from "../components/Home/CourseBanner";
 import DiscountBanner from "../components/Home/DiscountBanner";
 import HomeCards from "../components/Home/HomeCards";
 import CourseCards from "./../components/Home/CourseCards";
+import { getToken } from "../../utils/constants";
 
 const Home = () => {
   const [upcomingSession, setUpcomingSession] = useState(null);
@@ -12,28 +13,33 @@ const Home = () => {
 
   const fetchUpcomingSession = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getToken();
+
       const res = await fetch("http://localhost:3000/api/upcoming-sessions", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Use token directly
         },
         credentials: "include",
       });
 
       if (!res.ok) {
-        console.log("Failed to get session");
+        console.error(
+          `Failed to fetch session: ${res.status} - ${res.statusText}`
+        );
+        return;
       }
 
       const data = await res.json();
+
       if (data?.sessions?.length > 0) {
         setUpcomingSession(data.sessions[0]);
-      } else {
-        setMessage(data.message);
       }
+      
+      setMessage("No session available");
     } catch (error) {
-      console.log("Error occurred while fetch session");
+      console.error("Error occurred while fetching session:", error);
     }
   };
 
