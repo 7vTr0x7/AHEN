@@ -79,7 +79,9 @@ const CourseInfo = ({ course }) => {
   return (
     <div className="rounded-lg flex-1 p-6 flex flex-col justify-between">
       <div>
-        <p className="text-xl font-medium">{course.title}</p>
+        <p className="text-xl font-medium">
+          {course.title || course.courseTitle}
+        </p>
         <div className="flex items-center justify-between pr-44">
           <div className="text-sm flex items-center gap-1 text-[#959595] mt-2">
             <span>

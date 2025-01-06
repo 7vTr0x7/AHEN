@@ -9,44 +9,66 @@ const PracticeDriving = () => {
   const [selectedTab, setSelectedTab] = useState("Hatchback");
   const [currentImageIndex, setCurrentImageIndex] = useState({});
   const [isMobile, setIsMobile] = useState(false);
+  const [cars, setCars] = useState({ Hatchback: [], Sedan: [], SUV: [] }); // To store cars categorized by type
+  const [loading, setLoading] = useState(true); // For loading state
+  const [error, setError] = useState(""); // For error handling
 
   const tabs = ["Hatchback", "Sedan", "SUV"];
 
-  const cars = {
-    Hatchback: [
-      {
-        name: "Maruti Swift",
-        brand: "Maruti Suzuki",
-        price: "$8,000",
-        images: [
-          "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg",
-        ],
-        rating: 4, // Rating out of 5
-      },
-      {
-        name: "Hyundai i20",
-        brand: "Hyundai",
-        price: "$10,000",
-        images: [
-          "https://images.pexels.com/photos/164634/pexels-photo-164634.jpeg",
-          "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg",
-        ],
-        rating: 3, // Rating out of 5
-      },
-    ],
-    Sedan: [],
-    SUV: [
-      {
-        name: "Toyota Fortuner",
-        brand: "Toyota",
-        price: "$40,000",
-        images: [
-          "https://images.pexels.com/photos/1551702/pexels-photo-1551702.jpeg",
-        ],
-        rating: 5, // Rating out of 5
-      },
-    ],
-  };
+  useEffect(() => {
+    // Fetch data from the API
+    const fetchCars = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/practise-driving/all"
+        );
+        const data = await response.json();
+
+        if (data.message) {
+          const categorizedCars = { Hatchback: [], Sedan: [], SUV: [] };
+
+          // Categorize cars based on type
+          data.data.forEach((car) => {
+            const carType =
+              car.type.charAt(0).toUpperCase() +
+              car.type.slice(1).toLowerCase(); // Normalize type
+
+            if (categorizedCars[carType]) {
+              categorizedCars[carType].push({
+                name: car.carname,
+                brand: car.carbrand,
+                price: "$" + (car.price || "400"), // Default price if not available
+                images: [car.image], // Use the image from the API
+                rating: car.starRating, // Use the star rating from the API
+                about: {
+                  description:
+                    car.about?.description || "No description available",
+                  ownerName: car.about?.owner_name || "Unknown",
+                  ownerImage: car.about?.image || "",
+                },
+                reviews:
+                  car.reviews?.map((review) => ({
+                    text: review.text,
+                    starRating: review.starRating,
+                    createdAt: new Date(review.createdAt).toLocaleDateString(),
+                  })) || [],
+              });
+            }
+          });
+
+          setCars(categorizedCars);
+        } else {
+          setError("Failed to fetch data.");
+        }
+      } catch (error) {
+        setError("An error occurred while fetching the data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCars();
+  }, []);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);

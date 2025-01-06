@@ -16,11 +16,15 @@ import {
   toggleOpenStartSession,
 } from "../../../../redux/slices/sessionSlice";
 import EndSession from "./EndSession";
+import { useLocation } from "react-router-dom";
 
 const Session = () => {
   const [activeTab, setActiveTab] = useState("You'll learn");
 
   const dispatch = useDispatch();
+
+  const location = useLocation();
+  console.log(location.state.lesson);
 
   const handleOpenStartSession = () => {
     dispatch(toggleOpenStartSession(true));

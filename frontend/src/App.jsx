@@ -46,7 +46,6 @@ const App = () => {
       className={`font-aeonik relative h-screen ${
         isWishlistOpen || isUserLoginOpen ? "overflow-hidden" : ""
       }`}>
-      <Toaster />
       <Router>
         <Suspense fallback={<Loading />}>
           <Routes>
@@ -150,16 +149,15 @@ const App = () => {
             />
           </Routes>
         </Suspense>
+        {isWishlistOpen && <Wishlist />}
+        {isUserLoginOpen && (
+          <div className="login-slider">
+            <Suspense fallback={<Loading />}>
+              <Login />
+            </Suspense>
+          </div>
+        )}
       </Router>
-
-      {isWishlistOpen && <Wishlist />}
-      {isUserLoginOpen && (
-        <div className="login-slider">
-          <Suspense fallback={<div>Loading Login...</div>}>
-            <Login />
-          </Suspense>
-        </div>
-      )}
     </div>
   );
 };

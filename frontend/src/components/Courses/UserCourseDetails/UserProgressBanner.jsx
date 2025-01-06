@@ -3,7 +3,7 @@ import bg from "../../../assets/images/bannerBg.png";
 
 // Static progress bar component (no animations)
 const UserProgressBanner = ({
-  progress = 65, // Static progress value (in percentage)
+  progress, // Static progress value (in percentage)
   radius = 20, // Default radius
   strokeWidth = 6, // Default stroke width
   width = 50, // Default width of SVG

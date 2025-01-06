@@ -19,9 +19,11 @@ const CourseBanner = ({ upcomingSession, message }) => {
               backgroundRepeat: "no-repeat",
             }}>
             <p className="text-xl sm:text-2xl md:text-3xl font-semibold">
-              Beginner Driving Course: Master the Basics
+              {upcomingSession.session_title}
             </p>
-            <p className="text-xs sm:text-sm mt-2">Practice Session: 5</p>
+            <p className="text-xs sm:text-sm mt-2">
+              Practice Session: {upcomingSession.session_id}
+            </p>
 
             <div className="mt-4 md:mt-5 flex justify-end">
               <button className="bg-white text-black text-sm md:text-base rounded-md px-4 md:px-3 py-2 md:py-1 font-medium">

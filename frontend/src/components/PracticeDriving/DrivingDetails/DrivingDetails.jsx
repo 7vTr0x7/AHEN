@@ -19,11 +19,6 @@ const DrivingDetails = () => {
 
   const { car } = location.state;
 
-  const tabContent = {
-    about:
-      "The Beginner Driving Course is designed for first-time drivers or those with minimal driving experience. Our certified instructors will guide you through every aspect of driving, from the fundamental vehicle controls to mastering road safety and traffic rules. By the end of this course, you'll gain the skills and confidence needed to drive independently and prepare for your driving test.",
-  };
-
   return (
     <div className="bg-[#F3F4F6] pb-20 h-auto">
       <Navbar />
@@ -49,7 +44,7 @@ const DrivingDetails = () => {
 
               <div className="flex items-end justify-between">
                 <p className="text-lg font-semibold text-black">
-                  {car.price}
+                  {car.price.replace("$", "₹")}
                   <span className="text-gray-500 text-sm font-normal">
                     /hour
                   </span>
@@ -66,11 +61,7 @@ const DrivingDetails = () => {
           </div>
         </div>
         <CarTabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
-        <CarTabContent
-          activeTab={activeTab}
-          car={car.name}
-          tabContent={tabContent}
-        />
+        <CarTabContent activeTab={activeTab} car={car} />
       </div>
       {isSelectSlotOpen && <SelectSlot handleClose={setIsSelectSlotOpen} />}
     </div>

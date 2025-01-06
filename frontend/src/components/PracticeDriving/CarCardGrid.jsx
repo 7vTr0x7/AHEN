@@ -61,7 +61,7 @@ const CarCardGrid = ({ cars, currentImageIndex, handleImageClick }) => {
             </div>
 
             <p className="text-lg font-semibold text-black">
-              {car.price}
+              {car.price.replace("$", "₹")}
               <span className="text-gray-500 text-sm font-normal">/hour</span>
             </p>
           </div>

@@ -7,12 +7,16 @@ const SessionSlice = createSlice({
     isStartSessionOpen: false,
     isEndSessionOpen: false,
     isRateInstructorOpen: false,
+    session: null,
+    course: null,
   },
   reducers: {
     toggleOpenSessionBooking: (state, action) => {
       return {
         ...state,
-        isSessionBookingOpen: action.payload,
+        isSessionBookingOpen: action.payload.isOpen,
+        session: action.payload.session,
+        course: action.payload.course,
       };
     },
     toggleOpenStartSession: (state, action) => {

@@ -22,14 +22,14 @@ const Profile = () => {
       const fetchProfile = async () => {
         try {
           const response = await fetch(
-            `http://localhost:3000/api/profiles/profile/${storedUserId}`
+            `http://localhost:3000/api/users/users/${storedUserId}`
           );
           const data = await response.json();
-          setName(data.name || "");
-          setPhoneNumber(data.phoneNumber || "");
-          setEmail(data.email || "");
-          setGender(data.gender || "");
-          setDob(data.dob || "");
+          setName(data.user.name || "");
+          setPhoneNumber(data.user.phone_number || "");
+          setEmail(data.user.email || "");
+          setGender(data.user.gender || "");
+          setDob(data.user.date_of_birth || "");
         } catch (error) {
           console.error("Error fetching profile data:", error);
           toast.error("Error fetching profile data.");
@@ -60,10 +60,11 @@ const Profile = () => {
     // Create form data for the request
     const formData = new FormData();
     formData.append("name", name);
-    formData.append("phoneNumber", phoneNumber);
+    formData.append("photo", image);
+    formData.append("phone_number", phoneNumber);
     formData.append("email", email);
     formData.append("gender", gender);
-    formData.append("dob", dob);
+    formData.append("date_of_birth", dob);
 
     if (image) {
       // Upload the image here
@@ -83,7 +84,8 @@ const Profile = () => {
       );
 
       const result = await response.json();
-      if (result.success) {
+      console.log(result);
+      if (result) {
         // Update the toast with success message
         toast.success("Profile updated successfully!", {
           id: loadingToast,

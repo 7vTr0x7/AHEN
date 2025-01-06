@@ -12,6 +12,8 @@ import Navbar from "../Navbar";
 import cardImage1 from "../../assets/images/homeCardImage.png";
 
 const CourseDetails = () => {
+  const [sessionType, setSessionType] = useState(null);
+
   const location = useLocation();
   const { course } = location.state;
 
@@ -33,10 +35,13 @@ const CourseDetails = () => {
           </div>
           <div className="md:col-span-1 col-span-2">
             <CourseInfo course={course} />
-            <SessionButtons />
+            <SessionButtons
+              setSessionType={setSessionType}
+              sessionType={sessionType}
+            />
             <hr className="w-[70%] my-6 h-[2px] bg-black" />
 
-            <PaymentButtons course={course} />
+            <PaymentButtons course={course} sessionType={sessionType} />
           </div>
         </div>
 

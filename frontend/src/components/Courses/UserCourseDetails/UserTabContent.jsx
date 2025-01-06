@@ -9,49 +9,21 @@ import { toggleOpenReport } from "../../../redux/slices/reportSlice";
 import { useNavigate } from "react-router-dom";
 import { toggleOpenSessionBooking } from "../../../redux/slices/sessionSlice";
 
-const reviewsData = [
-  {
-    id: 1,
-    name: "Jenny Wilson",
-    date: "Dec 10, 2024",
-    rating: 4,
-    comment:
-      "Very nice and comfortable hotel, thank you for accompanying my vacation.",
-  },
-  {
-    id: 2,
-    name: "Guy Hawkins",
-    date: "Dec 10, 2024",
-    rating: 5,
-    comment:
-      "Very nice and comfortable hotel, thank you for accompanying my vacation.",
-  },
-  {
-    id: 3,
-    name: "Kristin Watson",
-    date: "Dec 10, 2024",
-    rating: 3,
-    comment:
-      "Very nice and comfortable hotel, thank you for accompanying my vacation.",
-  },
-];
-
-const UserTabContent = ({
-  activeTab,
-  course,
-  tabContent,
-  daysData,
-  toggleDropdown,
-  openIndex,
-}) => {
+const UserTabContent = ({ activeTab, course, toggleDropdown, openIndex }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleOpenReport = () => {
     dispatch(toggleOpenReport(true));
   };
-  const handleOpenSessionBooking = () => {
-    dispatch(toggleOpenSessionBooking(true));
+  const handleOpenSessionBooking = (lesson) => {
+    dispatch(
+      toggleOpenSessionBooking({
+        isOpen: true,
+        session: lesson,
+        course: course,
+      })
+    );
   };
 
   const renderStars = (rating) => {
@@ -68,7 +40,7 @@ const UserTabContent = ({
   const renderLessons = (lessons) => {
     let bookSessionIndex = lessons.findIndex(
       (lesson, index) =>
-        !lesson.completed && (index === 0 || lessons[index - 1].completed)
+        !lesson.isCompleted && (index === 0 || lessons[index - 1].isCompleted)
     );
 
     return lessons.map((lesson, index) => (
@@ -80,9 +52,9 @@ const UserTabContent = ({
           className="flex items-center justify-center cursor-pointer"
           onClick={() =>
             navigate(
-              `/courses/user/${course
+              `/courses/user/${course.courseTitle
                 .split(":")[0]
-                .replace(" ", "-")}/${lesson.lesson
+                .replace(" ", "-")}/${lesson.title
                 .toLowerCase()
                 .replace(" ", "-")}`,
               { state: { lesson } }
@@ -90,14 +62,14 @@ const UserTabContent = ({
           }>
           <div
             className={`w-7 h-7 flex items-center justify-center  text-gray-700 font-bold rounded-md mr-4  ${
-              lesson.completed ? "bg-black text-white" : "bg-gray-100"
+              lesson.isCompleted ? "bg-black text-white" : "bg-gray-100"
             }`}>
-            {lesson.completed ? <FaCheck /> : lesson.day}
+            {lesson.isCompleted ? <FaCheck /> : index + 1}
           </div>
-          <p className="text-gray-700">{lesson.lesson}</p>
+          <p className="text-gray-700">{lesson.title}</p>
         </div>
         <div className="ml-auto pr-4">
-          {lesson.completed ? (
+          {lesson.isCompleted ? (
             <button
               className="text-black flex gap-2 items-center px-2 py-1 rounded-md text-[11px] border border-black"
               onClick={handleOpenReport}>
@@ -107,7 +79,7 @@ const UserTabContent = ({
           ) : bookSessionIndex === index ? (
             <button
               className=" px-3 py-1 rounded-md text-[11px] bg-black text-white border border-black"
-              onClick={handleOpenSessionBooking}>
+              onClick={() => handleOpenSessionBooking(lesson)}>
               <p>Schedule Session</p>
             </button>
           ) : null}
@@ -121,46 +93,53 @@ const UserTabContent = ({
       <div className="md:col-span-1 col-span-2 rounded-lg">
         {activeTab === "courseContent" ? (
           <div className="mx-auto">
-            {daysData.map((day, index) => (
-              <div
-                key={index}
-                className="border-gray-300 mb-5 bg-white rounded-lg shadow-lg">
+            {course.content.length > 0 &&
+              course.content.map((day, index) => (
                 <div
-                  className="flex justify-between items-center p-4 cursor-pointer"
-                  onClick={() => toggleDropdown(index)}>
-                  <h2 className="text-sm font-semibold">{day.title}</h2>
-                  {openIndex === index ? (
-                    <FiMinus className="text-xl text-gray-600" />
-                  ) : (
-                    <FiPlus className="text-xl text-gray-600" />
+                  key={index}
+                  className="border-gray-300 mb-5 bg-white rounded-lg shadow-lg">
+                  <div
+                    className="flex justify-between items-center p-4 cursor-pointer"
+                    onClick={() => toggleDropdown(index)}>
+                    <h2 className="text-sm font-semibold">{day.title}</h2>
+                    {openIndex === index ? (
+                      <FiMinus className="text-xl text-gray-600" />
+                    ) : (
+                      <FiPlus className="text-xl text-gray-600" />
+                    )}
+                  </div>
+                  {openIndex === index && (
+                    <div className="border-gray-300">
+                      {renderLessons(day.sessions)}
+                    </div>
                   )}
                 </div>
-                {openIndex === index && (
-                  <div className="border-gray-300">
-                    {renderLessons(day.lessons)}
-                  </div>
-                )}
-              </div>
-            ))}
+              ))}
           </div>
         ) : activeTab === "reviews" ? (
           <div className="bg-white p-4 shadow-lg rounded-md">
-            {reviewsData.map((review) => (
-              <div key={review.id} className="mb-6 border-b pb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="text-sm font-semibold">{review.name}</h4>
-                  <span className="text-xs text-gray-500">{review.date}</span>
+            {course.reviews.length > 0 ? (
+              course.reviews.map((review, index) => (
+                <div key={index} className="mb-6 border-b pb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="text-sm font-semibold">{"non"}</h4>
+                    <span className="text-xs text-gray-500">
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center mb-2">
+                    {renderStars(review.starRating)}
+                  </div>
+                  <p className="text-gray-700 text-sm">{review.text}</p>
                 </div>
-                <div className="flex items-center mb-2">
-                  {renderStars(review.rating)}
-                </div>
-                <p className="text-gray-700 text-sm">{review.comment}</p>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p>No reviews</p>
+            )}
           </div>
         ) : (
           <div className="bg-white p-4 shadow-lg rounded-md">
-            <p>{tabContent[activeTab]}</p>
+            <p>{course.courseAbout}</p>
           </div>
         )}
       </div>

@@ -1,46 +1,200 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { AiOutlineClose } from "react-icons/ai";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toggleOpenSessionBooking } from "../../../../redux/slices/sessionSlice";
-import { IoIosInformationCircleOutline } from "react-icons/io";
+import toast from "react-hot-toast";
 
 import drivingImg from "../../../../assets/images/drivingLessons.png";
-
-const days = [
-  { id: 1, label: "Mon", date: 23 },
-  { id: 2, label: "Tue", date: 24 },
-  { id: 3, label: "Wed", date: 25 },
-  { id: 4, label: "Thu", date: 26 },
-  { id: 5, label: "Fri", date: 27 },
-  { id: 6, label: "Sat", date: 28 },
-];
-
-const timeSlots = [
-  "09:00 AM - 11:00 AM",
-  "11:00 AM - 01:00 PM",
-  "01:00 PM - 03:00 PM",
-  "03:00 PM - 05:00 PM",
-  "05:00 PM - 07:00 PM",
-];
+import { useNavigate } from "react-router-dom";
 
 const SessionBooking = () => {
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-  const [selectedDuration, setSelectedDuration] = useState("1"); // New state for duration
-  const [isPriceVisible, setIsPriceVisible] = useState(false);
   const [isFinalView, setIsFinalView] = useState(false);
   const dispatch = useDispatch();
 
+  const navigate = useNavigate();
+
   const handleClose = () => dispatch(toggleOpenSessionBooking(false));
 
-  const handleConfirmBooking = () => {
-    if (selectedDay && selectedTimeSlot) {
-      setIsPriceVisible(true);
+  const session = useSelector((state) => state.session.session);
+  const course = useSelector((state) => state.session.course);
+  const { sessionType, paymentType } = course;
+
+  // Determine API endpoint
+  const apiEndpoint =
+    sessionType === "group"
+      ? "http://localhost:3000/api/createGroupSession"
+      : "http://localhost:3000/api/createOneToOneSession";
+
+  // Generate next 6 days excluding today
+  const days = useMemo(() => {
+    const today = new Date();
+    return Array.from({ length: 6 }, (_, i) => {
+      const nextDate = new Date();
+      nextDate.setDate(today.getDate() + i + 1);
+      return {
+        id: i, // Ensure index starts from 0
+        label: nextDate.toLocaleDateString("en-US", { weekday: "short" }),
+        date: nextDate.toLocaleDateString("en-US", {
+          day: "2-digit",
+        }),
+      };
+    });
+  }, []);
+
+  const timeSlots = [
+    "09:00 AM - 11:00 AM",
+    "11:00 AM - 01:00 PM",
+    "01:00 PM - 03:00 PM",
+    "03:00 PM - 05:00 PM",
+    "05:00 PM - 07:00 PM",
+  ];
+
+  const createSession = async () => {
+    try {
+      const tokenData = localStorage.getItem("token");
+
+      if (!tokenData) {
+        toast.error("User not authenticated. Please log in.");
+        return;
+      }
+
+      let parsedToken;
+      try {
+        parsedToken = JSON.parse(tokenData);
+      } catch (error) {
+        console.error("Error parsing token:", error);
+        toast.error("Invalid authentication token. Please log in again.");
+        return;
+      }
+
+      const { value: authToken } = parsedToken; // Extract token value
+
+      // Determine API endpoint based on sessionType
+      const apiEndpoint =
+        sessionType === "group"
+          ? "http://localhost:3000/api/createGroupSession"
+          : "http://localhost:3000/api/createOneToOneSession";
+
+      // Convert selected day to YYYY-MM-DD format
+      const selectedDayObj = days.find((day) => day.id === selectedDay);
+      const slot_date = selectedDayObj
+        ? new Date(`${new Date().getFullYear()}-${selectedDayObj.date}`)
+            .toISOString()
+            .split("T")[0]
+        : "";
+
+      // Prepare the request body
+      const requestBody = {
+        course_id: course?.courseId,
+        booking_date: new Date().toISOString().split("T")[0], // Current date
+        slot_date, // Corrected to YYYY-MM-DD format
+        slot_time: selectedTimeSlot, // Converted to HH:MM:SS format
+        amount: 250, // Skip payment if payonce
+        session_id: session?.sessionId,
+        session_type: sessionType === "group" ? "group" : "one-to-one",
+      };
+
+      const response = await fetch(apiEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`, // Use correct token
+        },
+        body: JSON.stringify(requestBody),
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (data.bookingData) {
+        toast.success("Session booked successfully! 🎉");
+        setIsFinalView(true);
+      } else {
+        toast.error(
+          data.message || "Failed to book session. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("Error creating session:", error);
+      toast.error("An unexpected error occurred. Please try again.");
     }
   };
 
-  const handleShowFinalView = () => {
-    setIsFinalView(true);
+  // Handle Confirm Booking Click
+
+  const handleConfirmBooking = () => {
+    if (selectedDay !== null && selectedTimeSlot) {
+      if (paymentType === "payonce") {
+        createSession();
+      } else if (paymentType === "paydaily") {
+        initializeRazorpay(300, "Session Booking");
+      }
+    }
+  };
+
+  const initializeRazorpay = async (amount, description) => {
+    try {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      document.body.appendChild(script);
+      script.onload = async () => {
+        const tokenData = localStorage.getItem("token");
+        const { value } = JSON.parse(tokenData);
+        const response = await fetch(
+          "http://localhost:3000/api/payments/create-order",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${value}`,
+            },
+            body: JSON.stringify({
+              amount,
+              currency: "INR",
+              receipt: "receipt#1",
+            }),
+            credentials: "include",
+          }
+        );
+
+        const data = await response.json();
+        if (!data.success) {
+          toast.error("Failed to create order. Please try again.");
+          return;
+        }
+
+        const options = {
+          key: "rzp_test_3sEAtEoClhTs62",
+          amount: data.order.amount,
+          currency: "INR",
+          name: "Ahen",
+          description,
+          order_id: data.order.id,
+          handler: async () => {
+            toast.success("Payment successful! 🎉");
+            await createSession();
+          },
+          prefill: {
+            name: "Your Name",
+            email: "your-email@example.com",
+            contact: "9370624279",
+          },
+          theme: { color: "#3399cc" },
+        };
+
+        const razorpay = new window.Razorpay(options);
+        razorpay.on("payment.failed", () =>
+          toast.error("Payment failed. Please try again.")
+        );
+        razorpay.open();
+      };
+    } catch (error) {
+      console.error("Error initializing Razorpay:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    }
   };
 
   if (isFinalView) {
@@ -65,14 +219,14 @@ const SessionBooking = () => {
               Fasten your seat belts, your session is scheduled!
             </p>
             <div className="text-sm font-medium mt-4 flex items-center gap-2">
-              <p>Monday</p>
-              <p>23rd,</p>
+              <p>{days.find((day) => day.id === selectedDay)?.label}</p>
+              <p>{days.find((day) => day.id === selectedDay)?.date},</p>
             </div>
-            <p className="text-sm font-medium ">{selectedTimeSlot}</p>
+            <p className="text-sm font-medium">{selectedTimeSlot}</p>
 
             <button
               className="mt-4 text-sm px-8 font-normal py-2 bg-black text-white rounded-lg"
-              onClick={() => dispatch(toggleOpenSessionBooking(false))}>
+              onClick={() => navigate("/bookings")}>
               My Course
             </button>
           </div>
@@ -85,78 +239,39 @@ const SessionBooking = () => {
     <div>
       <div
         className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
-        onClick={handleClose}></div>
-
+        onClick={() => dispatch(toggleOpenSessionBooking(false))}></div>
       <div className="absolute z-50 w-[600px] left-1/2 top-2/4 transform -translate-x-1/2 -translate-y-1/2 rounded-lg shadow-lg">
         <div className="w-full bg-white rounded-lg shadow-md p-6 relative">
           <button
             className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
-            onClick={handleClose}>
+            onClick={() => dispatch(toggleOpenSessionBooking(false))}>
             <AiOutlineClose size={20} />
           </button>
-
           <h2 className="text-center text-xl font-semibold mb-6">
             Book Session
           </h2>
 
+          {/* Day Selection */}
           <div className="mb-4">
             <h3 className="font-medium text-sm mb-2">Day</h3>
-            <div className="flex space-x-3">
+            <div className="flex justify-between space-x-3">
               {days.map((day) => (
                 <button
                   key={day.id}
                   onClick={() => setSelectedDay(day.id)}
-                  className={`flex flex-col justify-center items-center w-16 h-16 border rounded-lg transition-colors duration-200 ${
+                  className={`px-4 py-2 border rounded-lg text-sm ${
                     selectedDay === day.id
                       ? "bg-black text-white"
-                      : "text-gray-700 border-gray-300"
+                      : "border-gray-300 text-gray-700"
                   }`}>
-                  <span className="text-sm">{day.label}</span>
-                  <span className="font-medium text-xl">{day.date}</span>
+                  <span>{day.label}</span>
+                  <span className="block text-xs">{day.date}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="mb-4">
-            <h3 className="font-medium text-sm mb-2">Hours</h3>
-            <div className="flex space-x-6 text-xs">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="duration"
-                  value="1"
-                  checked={selectedDuration === "1"}
-                  onChange={(e) => setSelectedDuration(e.target.value)}
-                  className="mr-2"
-                />
-                01 Hour
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="duration"
-                  value="2"
-                  checked={selectedDuration === "2"}
-                  onChange={(e) => setSelectedDuration(e.target.value)}
-                  className="mr-2"
-                />
-                02 Hours
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="duration"
-                  value="3"
-                  checked={selectedDuration === "3"}
-                  onChange={(e) => setSelectedDuration(e.target.value)}
-                  className="mr-2"
-                />
-                03 Hours
-              </label>
-            </div>
-          </div>
-
+          {/* Time Slot Selection */}
           <div className="mb-6">
             <h3 className="font-medium mb-2 text-sm">Time Slot</h3>
             <div className="grid grid-cols-3 gap-3">
@@ -164,7 +279,7 @@ const SessionBooking = () => {
                 <button
                   key={slot}
                   onClick={() => setSelectedTimeSlot(slot)}
-                  className={`px-2 py-1 border rounded-lg text-sm transition-colors duration-200 ${
+                  className={`px-2 py-1 border rounded-lg text-sm ${
                     selectedTimeSlot === slot
                       ? "bg-black text-white"
                       : "text-gray-700 border-gray-300"
@@ -175,27 +290,17 @@ const SessionBooking = () => {
             </div>
           </div>
 
+          {/* Confirm Button */}
           <div className="mt-12 flex justify-end">
-            {!isPriceVisible ? (
+            {!isFinalView && (
               <button
                 className="px-3 bg-black text-white py-2 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!selectedDay || !selectedTimeSlot}
+                disabled={selectedDay === null || !selectedTimeSlot}
                 onClick={handleConfirmBooking}>
-                Confirm Booking
+                {paymentType === "paydaily"
+                  ? "Pay Rs 300 & Confirm"
+                  : "Confirm Booking"}
               </button>
-            ) : (
-              <div className="flex flex-col gap-2">
-                <div className="text-[#767676] flex items-center gap-2">
-                  <IoIosInformationCircleOutline />
-                  <p className="text-xs">Pay once and avail discounts</p>
-                </div>
-                <button
-                  className="px-3 bg-black text-white py-2 flex gap-4 items-center rounded-lg text-sm"
-                  onClick={handleShowFinalView}>
-                  <span>Rs 250 /-</span>
-                  <span>Confirm Booking</span>
-                </button>
-              </div>
             )}
           </div>
         </div>
