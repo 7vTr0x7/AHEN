@@ -1,10 +1,15 @@
 import React from "react";
 
 import { FaStar } from "react-icons/fa";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const CarCardGrid = ({ cars, currentImageIndex, handleImageClick }) => {
   const navigate = useNavigate();
+
+  const practiceDrivingSearchText = useSelector(
+    (state) => state.practiceDriving.practiceDrivingSearchText
+  );
 
   if (!cars || cars.length === 0) {
     return (
@@ -16,7 +21,14 @@ const CarCardGrid = ({ cars, currentImageIndex, handleImageClick }) => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 w-full">
-      {cars.map((car) => (
+      {(practiceDrivingSearchText
+        ? cars.filter((car) =>
+            car.name
+              .toLowerCase()
+              .includes(practiceDrivingSearchText.toLowerCase())
+          )
+        : cars
+      ).map((car) => (
         <div
           key={car.name}
           className="bg-white w-full rounded-lg shadow-md p-4">

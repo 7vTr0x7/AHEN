@@ -1,33 +1,6 @@
 import React from "react";
 import { FaStar } from "react-icons/fa";
 
-const reviewsData = [
-  {
-    id: 1,
-    name: "Jenny Wilson",
-    date: "Dec 10, 2024",
-    rating: 4,
-    comment:
-      "Very nice and comfortable hotel, thank you for accompanying my vacation.",
-  },
-  {
-    id: 2,
-    name: "Guy Hawkins",
-    date: "Dec 10, 2024",
-    rating: 5,
-    comment:
-      "Very nice and comfortable hotel, thank you for accompanying my vacation.",
-  },
-  {
-    id: 3,
-    name: "Kristin Watson",
-    date: "Dec 10, 2024",
-    rating: 3,
-    comment:
-      "Very nice and comfortable hotel, thank you for accompanying my vacation.",
-  },
-];
-
 const CarTabContent = ({ activeTab, car }) => {
   const renderStars = (rating) => {
     const totalStars = 5;
@@ -39,7 +12,6 @@ const CarTabContent = ({ activeTab, car }) => {
       )
     );
   };
-  console.log(car.reviews);
   return (
     <div className="mt-8 grid grid-cols-2 text-sm">
       <div className="md:col-span-1 col-span-2 rounded-lg">

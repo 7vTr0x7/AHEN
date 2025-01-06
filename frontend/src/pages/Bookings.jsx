@@ -5,6 +5,8 @@ import Breadcrumb from "../components/Breadcrumb";
 const Bookings = () => {
   const [bookings, setBookings] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [showPopup, setShowPopup] = useState(false);
+  const [bookingId, setBookingId] = useState(null);
 
   useEffect(() => {
     // Fetch bookings data
@@ -21,7 +23,7 @@ const Bookings = () => {
         );
         const data = await response.json();
 
-        if (data.bookings.length > 0) {
+        if (data.bookings?.length > 0) {
           setBookings(data.bookings);
         } else {
           console.error("Failed to fetch bookings:", data.message);
@@ -33,6 +35,44 @@ const Bookings = () => {
 
     fetchBookings();
   }, []);
+
+  const handleCancel = (id) => {
+    setBookingId(id);
+    setShowPopup(true);
+  };
+
+  const handleConfirmCancel = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/update-cancel-booking",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            booking_id: bookingId,
+            new_status: "rejected",
+          }),
+        }
+      );
+
+      if (response.ok) {
+        setBookings((prev) =>
+          prev.map((booking) =>
+            booking.booking_id === bookingId
+              ? { ...booking, status: "rejected" }
+              : booking
+          )
+        );
+        setShowPopup(false);
+      } else {
+        console.error("Failed to cancel booking");
+      }
+    } catch (error) {
+      console.error("Error updating booking:", error);
+    }
+  };
 
   const filteredBookings =
     filter === "All"
@@ -63,7 +103,7 @@ const Bookings = () => {
             </button>
           ))}
         </div>
-        {filteredBookings.length === 0 ? (
+        {filteredBookings?.length === 0 ? (
           <div className="flex justify-center items-center h-48">
             <p className="text-gray-500 text-sm">No bookings available.</p>
           </div>
@@ -118,8 +158,9 @@ const Bookings = () => {
                             ? "text-green-500"
                             : "text-red-500"
                         }`}>
-                        {booking.status.charAt(0).toUpperCase() +
-                          booking.status.slice(1)}
+                        {(booking.status === "pending" && "Upcoming") ||
+                          (booking.status === "rejected" && "Cancelled") ||
+                          (booking.status === "completed" && "Completed")}
                       </span>
                     </div>
                   </div>
@@ -140,7 +181,9 @@ const Bookings = () => {
                 </div>
                 {booking.status.toLowerCase() === "pending" && (
                   <div className="flex justify-end mt-2">
-                    <button className="border border-black text-xs px-4 py-1 rounded-lg">
+                    <button
+                      onClick={() => handleCancel(booking.booking_id)}
+                      className="border border-black text-xs px-4 py-1 rounded-lg">
                       Cancel Booking
                     </button>
                   </div>
@@ -150,6 +193,29 @@ const Bookings = () => {
           </div>
         )}
       </div>
+
+      {showPopup && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-md h-44 flex flex-col justify-center text-center">
+            <p className="mb-4 font-bold text-xl">Cancel Booking?</p>
+            <p className="mb-4">
+              Are you sure you want to cancel your booking?
+            </p>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => setShowPopup(false)}
+                className="px-8 w-full py-2 bg-white text-black border border-black rounded-xl">
+                No
+              </button>
+              <button
+                onClick={handleConfirmCancel}
+                className="px-8 py-2 w-full bg-black text-white rounded-xl">
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

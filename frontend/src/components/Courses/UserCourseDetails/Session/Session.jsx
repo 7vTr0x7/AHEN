@@ -4,9 +4,7 @@ import Breadcrumb from "../../../Breadcrumb";
 import Navbar from "../../../Navbar";
 import SessionTabContent from "./SessionTabContent";
 import SessionTabNavigation from "./SessionTabNavigation";
-
 import { CiCalendar } from "react-icons/ci";
-
 import { BsArrowRight } from "react-icons/bs";
 import SessionBooking from "./SessionBooking";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,11 +22,13 @@ const Session = () => {
   const dispatch = useDispatch();
 
   const location = useLocation();
-  console.log(location.state.lesson);
+  const sessionData = location.state.lesson; 
+  console.log()
 
   const handleOpenStartSession = () => {
     dispatch(toggleOpenStartSession(true));
   };
+
   const handleOpenEndSession = () => {
     dispatch(toggleOpenEndSession(true));
   };
@@ -42,41 +42,47 @@ const Session = () => {
           <div className="md:col-span-1 col-span-2">
             <img
               alt="driving"
-              src={drivingImage}
-              className="w-full  rounded-lg shadow-lg"
+              src={sessionData.image}
+              className="w-full rounded-lg shadow-lg"
             />
-            <div className="flex items-center justify-end  mt-6 ">
+            {/* <div className="flex items-center justify-end mt-6">
               <button className="bg-black text-white flex items-center gap-2 px-4 py-3 rounded-lg">
                 <CiCalendar className="text-xl" />
                 <p className="text-sm">Book Session</p>
                 <BsArrowRight className="text-lg font-light ml-5" />
               </button>
-            </div>
-            <div className="flex items-center justify-end  mt-6 ">
+            </div> */}
+            <div className="flex items-center justify-end mt-6">
               <button
                 className="bg-black text-white flex items-center gap-2 px-4 py-3 rounded-lg"
-                onClick={handleOpenStartSession}>
+                onClick={handleOpenStartSession}
+              >
                 <CiCalendar className="text-xl" />
                 <p className="text-sm">Start Session</p>
                 <BsArrowRight className="text-lg font-light ml-5" />
               </button>
             </div>
-            <div className="flex items-center justify-end  mt-6 ">
+            {/* <div className="flex items-center justify-end mt-6">
               <button
                 className="bg-black text-white flex items-center gap-2 px-4 py-3 rounded-lg"
-                onClick={handleOpenEndSession}>
+                onClick={handleOpenEndSession}
+              >
                 <CiCalendar className="text-xl" />
                 <p className="text-sm">End Session</p>
                 <BsArrowRight className="text-lg font-light ml-5" />
               </button>
-            </div>
+            </div> */}
           </div>
           <div className="pl-2 md:col-span-1 col-span-2">
             <SessionTabNavigation
               activeTab={activeTab}
               setActiveTab={setActiveTab}
             />
-            <SessionTabContent activeTab={activeTab} />
+            <SessionTabContent
+              activeTab={activeTab}
+              youLearn={sessionData.youlearn}
+              tips={sessionData.tips}
+            />
           </div>
         </div>
       </div>

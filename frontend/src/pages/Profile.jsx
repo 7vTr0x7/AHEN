@@ -26,10 +26,14 @@ const Profile = () => {
           );
           const data = await response.json();
           setName(data.user.name || "");
+          setImage(data.user.photo || "");
           setPhoneNumber(data.user.phone_number || "");
           setEmail(data.user.email || "");
           setGender(data.user.gender || "");
-          setDob(data.user.date_of_birth || "");
+          const formattedDob = data.user.date_of_birth
+            ? new Date(data.user.date_of_birth).toISOString().split("T")[0]
+            : "";
+          setDob(formattedDob);
         } catch (error) {
           console.error("Error fetching profile data:", error);
           toast.error("Error fetching profile data.");
@@ -43,7 +47,7 @@ const Profile = () => {
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
+      setImage(file); // Store the file object directly
     }
   };
 
@@ -60,15 +64,14 @@ const Profile = () => {
     // Create form data for the request
     const formData = new FormData();
     formData.append("name", name);
-    formData.append("photo", image);
     formData.append("phone_number", phoneNumber);
     formData.append("email", email);
     formData.append("gender", gender);
-    formData.append("date_of_birth", dob);
+    const formattedDob = new Date(dob).toISOString().split("T")[0]; // This will format it as 'YYYY-MM-DD'
+    formData.append("date_of_birth", formattedDob);
 
     if (image) {
-      // Upload the image here
-      formData.append("profileImage", image);
+      formData.append("photo", image); // Append the file object
     }
 
     try {
@@ -79,13 +82,12 @@ const Profile = () => {
           headers: {
             Authorization: `Bearer ${value}`, // Add token in the Authorization header
           },
-          body: formData,
+          body: formData, // FormData handles the multipart/form-data
         }
       );
 
       const result = await response.json();
-      console.log(result);
-      if (result) {
+      if (result.profile) {
         // Update the toast with success message
         toast.success("Profile updated successfully!", {
           id: loadingToast,

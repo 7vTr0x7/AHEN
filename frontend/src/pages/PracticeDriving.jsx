@@ -35,6 +35,7 @@ const PracticeDriving = () => {
 
             if (categorizedCars[carType]) {
               categorizedCars[carType].push({
+                id: car.id,
                 name: car.carname,
                 brand: car.carbrand,
                 price: "$" + (car.price || "400"), // Default price if not available

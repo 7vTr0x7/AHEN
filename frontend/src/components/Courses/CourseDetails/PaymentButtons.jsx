@@ -117,7 +117,7 @@ const PaymentButtons = ({ course, sessionType }) => {
         prefill: {
           name: user?.name,
           email: user?.email,
-          contact: user?.phone_number,
+          contact: `+91${user?.phone_number}`,
         },
         theme: { color: "#3399cc" },
         method: { upi: true },

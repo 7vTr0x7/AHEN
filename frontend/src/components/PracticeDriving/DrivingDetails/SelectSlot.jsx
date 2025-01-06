@@ -1,32 +1,109 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
-const days = [
-  { id: 1, label: "Mon", date: 23 },
-  { id: 2, label: "Tue", date: 24 },
-  { id: 3, label: "Wed", date: 25 },
-  { id: 4, label: "Thu", date: 26 },
-  { id: 5, label: "Fri", date: 27 },
-  { id: 6, label: "Sat", date: 28 },
-];
-
-const timeSlots = [
-  "09:00 AM - 11:00 AM",
-  "11:00 AM - 01:00 PM",
-  "01:00 PM - 03:00 PM",
-  "03:00 PM - 05:00 PM",
-  "05:00 PM - 07:00 PM",
-];
-
-const SelectSlot = ({ handleClose }) => {
+const SelectSlot = ({ handleClose, car }) => {
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [selectedDuration, setSelectedDuration] = useState("1"); // New state for duration
 
-  const handleBooking = () => {
-    if (selectedDay && selectedTimeSlot) {
-      console.log("");
+  const navigate = useNavigate();
+
+  const days = useMemo(() => {
+    const today = new Date();
+    return Array.from({ length: 6 }, (_, i) => {
+      const nextDate = new Date();
+      nextDate.setDate(today.getDate() + i + 1);
+      return {
+        id: i, // Ensure index starts from 0
+        label: nextDate.toLocaleDateString("en-US", { weekday: "short" }),
+        date: nextDate, // Store the full Date object
+      };
+    });
+  }, []);
+
+  const timeSlots = [
+    "09:00 AM - 11:00 AM",
+    "11:00 AM - 01:00 PM",
+    "01:00 PM - 03:00 PM",
+    "03:00 PM - 05:00 PM",
+    "05:00 PM - 07:00 PM",
+  ];
+
+  const createSession = async () => {
+    try {
+      const tokenData = localStorage.getItem("token");
+
+      if (!tokenData) {
+        toast.error("User not authenticated. Please log in.");
+        return;
+      }
+
+      let parsedToken;
+      try {
+        parsedToken = JSON.parse(tokenData);
+      } catch (error) {
+        console.error("Error parsing token:", error);
+        toast.error("Invalid authentication token. Please log in again.");
+        return;
+      }
+
+      const { value: authToken } = parsedToken; // Extract token value
+
+      const apiEndpoint = "http://localhost:3000/api/create-booking";
+
+      // Use the full date object for slot_date
+      const selectedDayObj = days.find((day) => day.id === selectedDay);
+      const slot_date = selectedDayObj
+        ? selectedDayObj.date.toISOString().split("T")[0]
+        : "";
+
+      // Prepare the request body
+      const requestBody = {
+        practisedrivingid: car.id,
+        booking_date: new Date().toISOString().split("T")[0], // Current date
+        slot_date: slot_date,
+        slot_time: selectedTimeSlot,
+        status: "pending",
+        amount: Number(car.price.replace("$", "")),
+        hours: selectedDuration,
+      };
+
+      const response = await fetch(apiEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`, // Use correct token
+        },
+        body: JSON.stringify(requestBody),
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (data) {
+        toast.success("Session booked successfully! 🎉");
+        navigate("/bookings");
+      } else {
+        toast.error(
+          data.message || "Failed to book session. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("Error creating session:", error);
+      toast.error("An unexpected error occurred. Please try again.");
     }
+  };
+
+  const handleBooking = () => {
+    if (selectedDay !== null && selectedTimeSlot) {
+      createSession();
+    }
+  };
+
+  const handleDayClick = (dayId) => {
+    setSelectedDay(dayId);
   };
 
   return (
@@ -53,14 +130,16 @@ const SelectSlot = ({ handleClose }) => {
               {days.map((day) => (
                 <button
                   key={day.id}
-                  onClick={() => setSelectedDay(day.id)}
+                  onClick={() => handleDayClick(day.id)}
                   className={`flex flex-col justify-center items-center w-16 h-16 border rounded-lg transition-colors duration-200 ${
                     selectedDay === day.id
                       ? "bg-black text-white"
                       : "text-gray-700 border-gray-300"
                   }`}>
                   <span className="text-sm">{day.label}</span>
-                  <span className="font-medium text-xl">{day.date}</span>
+                  <span className="font-medium text-xl">
+                    {day.date.getDate()}
+                  </span>
                 </button>
               ))}
             </div>
@@ -123,16 +202,14 @@ const SelectSlot = ({ handleClose }) => {
             </div>
           </div>
 
-          {
-            <div className="mt-12 flex justify-end">
-              <button
-                className="px-3 bg-black text-white py-2 rounded-lg text-sm"
-                onClick={handleBooking}
-                disabled={!selectedDay || !selectedTimeSlot}>
-                Confirm Booking
-              </button>
-            </div>
-          }
+          <div className="mt-12 flex justify-end">
+            <button
+              className="px-3 bg-black text-white py-2 rounded-lg text-sm"
+              onClick={handleBooking}
+              disabled={selectedDay === null || !selectedTimeSlot}>
+              Confirm Booking
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleOpenSessionBooking } from "../../../../redux/slices/sessionSlice";
@@ -11,6 +11,7 @@ const SessionBooking = () => {
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [isFinalView, setIsFinalView] = useState(false);
+  const [user, setUser] = useState(null);
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
@@ -21,13 +22,29 @@ const SessionBooking = () => {
   const course = useSelector((state) => state.session.course);
   const { sessionType, paymentType } = course;
 
-  // Determine API endpoint
-  const apiEndpoint =
-    sessionType === "group"
-      ? "http://localhost:3000/api/createGroupSession"
-      : "http://localhost:3000/api/createOneToOneSession";
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id");
 
-  // Generate next 6 days excluding today
+    if (storedUserId) {
+      const fetchProfile = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/api/users/users/${storedUserId}`
+          );
+          const data = await response.json();
+          if (data?.user) {
+            setUser(data.user);
+          }
+        } catch (error) {
+          console.error("Error fetching profile data:", error);
+          toast.error("Error fetching profile data.");
+        }
+      };
+
+      fetchProfile();
+    }
+  }, []);
+
   const days = useMemo(() => {
     const today = new Date();
     return Array.from({ length: 6 }, (_, i) => {
@@ -122,8 +139,6 @@ const SessionBooking = () => {
     }
   };
 
-  // Handle Confirm Booking Click
-
   const handleConfirmBooking = () => {
     if (selectedDay !== null && selectedTimeSlot) {
       if (paymentType === "payonce") {
@@ -178,9 +193,9 @@ const SessionBooking = () => {
             await createSession();
           },
           prefill: {
-            name: "Your Name",
-            email: "your-email@example.com",
-            contact: "9370624279",
+            name: user?.name,
+            email: user?.email,
+            contact: user?.phone_number,
           },
           theme: { color: "#3399cc" },
         };

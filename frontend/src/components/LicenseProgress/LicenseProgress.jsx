@@ -1,8 +1,8 @@
 import React from "react";
-import Attached_one from "../../assets/images/Attached-one.svg";
-import Attached_two from "../../assets/images/Attached-two.svg";
-import Navbar from "../Navbar.jsx";
-import DrivingLicense from "../../assets/images/DrivingLicense_Man.svg";
+import Attached_one from "../Images/Attached-one.svg";
+import Attached_two from "../Images/Attached-two.svg";
+import Navbar from "../Navbar";
+import DrivingLicense from "../Images/DrivingLicense_Man.svg";
 
 function LicenseProgress() {
   return (
