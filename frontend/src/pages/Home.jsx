@@ -15,14 +15,17 @@ const Home = () => {
     try {
       const token = await getToken();
 
-      const res = await fetch("http://localhost:3000/api/upcoming-sessions", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Use token directly
-        },
-        credentials: "include",
-      });
+      const res = await fetch(
+        "https://driving.shellcode.cloud/api/upcoming-sessions",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Use token directly
+          },
+          credentials: "include",
+        }
+      );
 
       if (!res.ok) {
         console.error(
@@ -36,7 +39,7 @@ const Home = () => {
       if (data?.sessions?.length > 0) {
         setUpcomingSession(data.sessions[0]);
       }
-      
+
       setMessage("No session available");
     } catch (error) {
       console.error("Error occurred while fetching session:", error);

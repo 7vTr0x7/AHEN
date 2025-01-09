@@ -15,7 +15,7 @@ const UserCourses = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/purchased-courses/${userId}`
+        `https://driving.shellcode.cloud/api/purchased-courses/${userId}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch courses");

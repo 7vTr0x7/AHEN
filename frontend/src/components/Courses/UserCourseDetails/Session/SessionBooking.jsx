@@ -29,7 +29,7 @@ const SessionBooking = () => {
       const fetchProfile = async () => {
         try {
           const response = await fetch(
-            `http://localhost:3000/api/users/users/${storedUserId}`
+            `https://driving.shellcode.cloud/api/users/users/${storedUserId}`
           );
           const data = await response.json();
           if (data?.user) {
@@ -91,8 +91,8 @@ const SessionBooking = () => {
       // Determine API endpoint based on sessionType
       const apiEndpoint =
         sessionType === "group"
-          ? "http://localhost:3000/api/createGroupSession"
-          : "http://localhost:3000/api/createOneToOneSession";
+          ? "https://driving.shellcode.cloud/api/createGroupSession"
+          : "https://driving.shellcode.cloud/api/createOneToOneSession";
 
       // Convert selected day to YYYY-MM-DD format
       const selectedDayObj = days.find((day) => day.id === selectedDay);
@@ -159,7 +159,7 @@ const SessionBooking = () => {
         const tokenData = localStorage.getItem("token");
         const { value } = JSON.parse(tokenData);
         const response = await fetch(
-          "http://localhost:3000/api/payments/create-order",
+          "https://driving.shellcode.cloud/api/payments/create-order",
           {
             method: "POST",
             headers: {

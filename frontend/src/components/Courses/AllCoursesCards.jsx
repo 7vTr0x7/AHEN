@@ -6,7 +6,7 @@ const AllCourseCards = () => {
 
   const fetchCourses = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/courses");
+      const res = await fetch("https://driving.shellcode.cloud/api/courses");
 
       if (!res.ok) {
         console.log("Failed to get session");

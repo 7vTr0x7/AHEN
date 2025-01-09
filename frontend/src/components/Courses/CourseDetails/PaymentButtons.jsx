@@ -15,7 +15,7 @@ const PaymentButtons = ({ course, sessionType }) => {
       const fetchProfile = async () => {
         try {
           const response = await fetch(
-            `http://localhost:3000/api/users/users/${storedUserId}`
+            `https://driving.shellcode.cloud/api/users/users/${storedUserId}`
           );
           const data = await response.json();
           if (data?.user) {
@@ -55,7 +55,7 @@ const PaymentButtons = ({ course, sessionType }) => {
       }
 
       const response = await fetch(
-        "http://localhost:3000/api/payments/create-order",
+        "https://driving.shellcode.cloud/api/payments/create-order",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -89,7 +89,7 @@ const PaymentButtons = ({ course, sessionType }) => {
             }
 
             const purchaseResponse = await fetch(
-              "http://localhost:3000/api/purchase-course",
+              "https://driving.shellcode.cloud/api/purchase-course",
               {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

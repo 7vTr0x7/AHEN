@@ -20,7 +20,7 @@ const PracticeDriving = () => {
     const fetchCars = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/practise-driving/all"
+          "https://driving.shellcode.cloud/practise-driving/all"
         );
         const data = await response.json();
 

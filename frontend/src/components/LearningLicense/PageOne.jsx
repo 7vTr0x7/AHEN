@@ -74,7 +74,7 @@ function PageOne() {
       const fetchProfile = async () => {
         try {
           const response = await fetch(
-            `http://localhost:3000/api/users/users/${storedUserId}`
+            `https://driving.shellcode.cloud/api/users/users/${storedUserId}`
           );
           const data = await response.json();
           if (data?.user) {
@@ -94,7 +94,7 @@ function PageOne() {
     const fetchPrice = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/license/licenses/price"
+          "https://driving.shellcode.cloud/license/licenses/price"
         );
         if (!response.ok) {
           throw new Error("Failed to fetch price");
@@ -460,7 +460,7 @@ function PageOne() {
         const tokenData = localStorage.getItem("token");
         const { value } = JSON.parse(tokenData);
         const response = await fetch(
-          "http://localhost:3000/api/payments/create-order",
+          "https://driving.shellcode.cloud/api/payments/create-order",
           {
             method: "POST",
             headers: {
@@ -585,10 +585,13 @@ function PageOne() {
 
     // Make the API call using fetch
     try {
-      const response = await fetch("http://localhost:3000/license/create", {
-        method: "POST",
-        body: formDataObj, // Send FormData as body
-      });
+      const response = await fetch(
+        "https://driving.shellcode.cloud/license/create",
+        {
+          method: "POST",
+          body: formDataObj, // Send FormData as body
+        }
+      );
 
       // Check if the response is successful
       if (response.ok) {

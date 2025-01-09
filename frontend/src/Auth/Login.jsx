@@ -42,8 +42,8 @@ const Login = () => {
 
     const toastId = toast.loading(isSignup ? "Signing up..." : "Logging in...");
     const url = isSignup
-      ? "http://localhost:3000/api/users/signup"
-      : "http://localhost:3000/api/users/login";
+      ? "https://driving.shellcode.cloud/api/users/signup"
+      : "https://driving.shellcode.cloud/api/users/login";
 
     try {
       const response = await fetch(url, {

@@ -22,7 +22,7 @@ const Profile = () => {
       const fetchProfile = async () => {
         try {
           const response = await fetch(
-            `http://localhost:3000/api/users/users/${storedUserId}`
+            `https://driving.shellcode.cloud/api/users/users/${storedUserId}`
           );
           const data = await response.json();
           setName(data.user.name || "");
@@ -76,7 +76,7 @@ const Profile = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/profiles/updateProfile",
+        "https://driving.shellcode.cloud/api/profiles/updateProfile",
         {
           method: "PUT",
           headers: {

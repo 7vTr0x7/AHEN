@@ -14,7 +14,7 @@ const WishlistCards = () => {
       if (userId) {
         try {
           const response = await fetch(
-            `http://localhost:3000/api/wishlist/${userId}`
+            `https://driving.shellcode.cloud/api/wishlist/${userId}`
           );
           const wishlistData = await response.json();
           setData(wishlistData.wishlist);
@@ -43,7 +43,7 @@ const WishlistCards = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/remove-course-from-wishlist",
+        "https://driving.shellcode.cloud/api/remove-course-from-wishlist",
         {
           method: "DELETE",
           headers: {

@@ -49,7 +49,7 @@ const SelectSlot = ({ handleClose, car }) => {
         return;
       }
 
-      const apiEndpoint = "http://localhost:3000/api/create-booking";
+      const apiEndpoint = "https://driving.shellcode.cloud/api/create-booking";
 
       // Use the full date object for slot_date
       const selectedDayObj = days.find((day) => day.id === selectedDay);

@@ -13,7 +13,7 @@ const CourseInfo = ({ course }) => {
       if (userId) {
         try {
           const response = await fetch(
-            `http://localhost:3000/api/wishlist/${userId}`
+            `https://driving.shellcode.cloud/api/wishlist/${userId}`
           );
           const wishlistData = await response.json();
 
@@ -47,7 +47,7 @@ const CourseInfo = ({ course }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/${
+        `https://driving.shellcode.cloud/api/${
           isInWishlist ? "remove-course-from-wishlist" : "wishlist"
         }`,
         {
