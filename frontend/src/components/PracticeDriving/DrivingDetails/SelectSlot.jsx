@@ -49,8 +49,6 @@ const SelectSlot = ({ handleClose, car }) => {
         return;
       }
 
-      const { value: authToken } = parsedToken; // Extract token value
-
       const apiEndpoint = "http://localhost:3000/api/create-booking";
 
       // Use the full date object for slot_date
@@ -74,7 +72,7 @@ const SelectSlot = ({ handleClose, car }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`, // Use correct token
+          Authorization: `Bearer ${parsedToken.value}`, // Use correct token
         },
         body: JSON.stringify(requestBody),
         credentials: "include",

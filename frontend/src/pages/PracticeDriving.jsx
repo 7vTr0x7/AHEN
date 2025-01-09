@@ -49,6 +49,7 @@ const PracticeDriving = () => {
                 },
                 reviews:
                   car.reviews?.map((review) => ({
+                    user: review.user,
                     text: review.text,
                     starRating: review.starRating,
                     createdAt: new Date(review.createdAt).toLocaleDateString(),

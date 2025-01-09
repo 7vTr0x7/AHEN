@@ -122,7 +122,8 @@ const UserTabContent = ({ activeTab, course, toggleDropdown, openIndex }) => {
               course.reviews.map((review, index) => (
                 <div key={index} className="mb-6 border-b pb-4">
                   <div className="flex justify-between items-center mb-2">
-                    <h4 className="text-sm font-semibold">{"non"}</h4>
+                    <h4 className="text-sm font-semibold">{review.userName}</h4>
+
                     <span className="text-xs text-gray-500">
                       {new Date(review.createdAt).toLocaleDateString()}
                     </span>

@@ -114,16 +114,16 @@ const Bookings = () => {
                 <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200">
                   <div className="flex items-start mb-4 border-b pb-4">
                     <img
-                      src="https://via.placeholder.com/150"
+                      src={booking.image || "https://via.placeholder.com/150"}
                       alt="Car"
                       className="rounded-md w-28 h-20 object-cover mr-4"
                     />
                     <div className="pt-4">
                       <h2 className="text-base font-bold mb-1">
-                        {booking.course_id}
+                        {booking.title}
                       </h2>
                       <p className="text-gray-500 text-xs">
-                        {booking.slot_time}
+                        {booking.description}
                       </p>
                     </div>
                   </div>

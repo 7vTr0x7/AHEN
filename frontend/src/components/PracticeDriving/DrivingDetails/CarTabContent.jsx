@@ -12,6 +12,7 @@ const CarTabContent = ({ activeTab, car }) => {
       )
     );
   };
+
   return (
     <div className="mt-8 grid grid-cols-2 text-sm">
       <div className="md:col-span-1 col-span-2 rounded-lg">
@@ -20,7 +21,7 @@ const CarTabContent = ({ activeTab, car }) => {
             {car.reviews.map((review) => (
               <div key={review.id} className="mb-6 border-b pb-4">
                 <div className="flex justify-between items-center mb-2">
-                  <h4 className="text-sm font-semibold">{"non"}</h4>
+                  <h4 className="text-sm font-semibold">{review.user.name}</h4>
                   <span className="text-xs text-gray-500">
                     {review.createdAt}
                   </span>

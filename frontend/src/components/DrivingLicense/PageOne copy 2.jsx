@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../Navbar";
 import PageSeven from "./PageSeven";
 import PageEight from "./PageEight";
@@ -8,10 +8,35 @@ import PageFour from "./PageFour";
 import PageFive from "./PageFive";
 import PageSix from "./PageSix";
 import PageNine from "./PageNine";
+import toast from "react-hot-toast";
 
 function PageOne() {
+  const [user, setUser] = useState(null);
   const [step, setStep] = useState(1); // Track the current step
   const [errors, setErrors] = useState([]); // Track the validation errors
+  const [isPayed, setIsPayed] = useState(false);
+
+    const [price, setPrice] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPrice = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/license/licenses/price");
+        if (!response.ok) {
+          throw new Error("Failed to fetch price");
+        }
+        const result = await response.json();
+        const drivingLicensePrice = result.data.find(
+          (item: { price_type: string }) => item.price_type === "driving_license_customer_price"
+        );
+        setPrice(drivingLicensePrice?.price || null);
+      } catch (error) {
+        console.error("Error fetching price:", error);
+      }
+    };
+
+    fetchPrice();
+  }, []);
 
   // Content for each step
   const stepsContent = [
@@ -65,7 +90,100 @@ function PageOne() {
     return isValid;
   };
 
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id");
+
+    if (storedUserId) {
+      const fetchProfile = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/api/users/users/${storedUserId}`
+          );
+          const data = await response.json();
+          if (data?.user) {
+            setUser(data.user);
+          }
+        } catch (error) {
+          console.error("Error fetching profile data:", error);
+          toast.error("Error fetching profile data.");
+        }
+      };
+
+      fetchProfile();
+    }
+  }, []);
+
+  const initializeRazorpay = async (amount, description) => {
+    try {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      document.body.appendChild(script);
+      script.onload = async () => {
+        const tokenData = localStorage.getItem("token");
+        const { value } = JSON.parse(tokenData);
+        const response = await fetch(
+          "http://localhost:3000/api/payments/create-order",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${value}`,
+            },
+            body: JSON.stringify({
+              amount,
+              currency: "INR",
+              receipt: "receipt#1",
+            }),
+            credentials: "include",
+          }
+        );
+
+        const data = await response.json();
+        if (!data.success) {
+          toast.error("Failed to create order. Please try again.");
+          return;
+        }
+
+        const options = {
+          key: "rzp_test_3sEAtEoClhTs62",
+          amount: data.order.amount,
+          currency: "INR",
+          name: "Ahen",
+          description,
+          order_id: data.order.id,
+          handler: async () => {
+            toast.success("Payment successful! 🎉");
+            setIsPayed(true);
+          },
+          prefill: {
+            name: user?.name,
+            email: user?.email,
+            contact: user?.phone_number,
+          },
+          theme: { color: "#3399cc" },
+        };
+
+        const razorpay = new window.Razorpay(options);
+        razorpay.on("payment.failed", () =>
+          toast.error("Payment failed. Please try again.")
+        );
+        razorpay.open();
+      };
+    } catch (error) {
+      console.error("Error initializing Razorpay:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    }
+  };
+
   // Move to the next step
+  const handleSubmit = () => {
+    if (validateFields()) {
+      cosnt amount
+      initializeRazorpay(amount, "Pay for driving license")
+    }
+  };
+
   const handleNext = () => {
     if (validateFields()) {
       if (step < stepsContent.length) {
@@ -110,8 +228,7 @@ function PageOne() {
                   flex: 1,
                   marginRight:
                     index !== stepsContent.length - 1 ? "0.25rem" : 0,
-                }}
-              ></span>
+                }}></span>
             ))}
         </div>
 
@@ -183,8 +300,7 @@ function PageOne() {
           {step > 1 && (
             <button
               onClick={handleBack}
-              className="bg-black text-white py-2 px-6 rounded hover:bg-gray-800 transition"
-            >
+              className="bg-black text-white py-2 px-6 rounded hover:bg-gray-800 transition">
               Back
             </button>
           )}
@@ -193,17 +309,17 @@ function PageOne() {
           {step < stepsContent.length ? (
             <button
               onClick={handleNext}
-              className="bg-black text-white py-2 px-6 rounded hover:bg-gray-800 transition"
-            >
+              className="bg-black text-white py-2 px-6 rounded hover:bg-gray-800 transition">
               Next
             </button>
           ) : (
-            <button
-              onClick={() => alert("Form submitted successfully!")}
-              className="bg-black text-white py-2 px-6 rounded hover:bg-gray-800 transition"
-            >
+            <>
+          { isPayed &&  <button
+              onClick={handleSubmit}
+              className="bg-black text-white py-2 px-6 rounded hover:bg-gray-800 transition">
               Submit
-            </button>
+            </button>}
+          </>
           )}
         </div>
       </div>

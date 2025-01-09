@@ -2,13 +2,7 @@ import React from "react";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { FaStar, FaRegStar } from "react-icons/fa";
 
-const TabContent = ({
-  activeTab,
-  course,
-  daysData,
-  toggleDropdown,
-  openIndex,
-}) => {
+const TabContent = ({ activeTab, course, toggleDropdown, openIndex }) => {
   const renderStars = (rating) => {
     const totalStars = 5;
     return Array.from({ length: totalStars }, (_, index) =>
@@ -66,7 +60,7 @@ const TabContent = ({
               course.reviews.map((review, index) => (
                 <div key={index} className="mb-6 border-b pb-4">
                   <div className="flex justify-between items-center mb-2">
-                    <h4 className="text-sm font-semibold">{"non"}</h4>
+                    <h4 className="text-sm font-semibold">{review.userName}</h4>
                     <span className="text-xs text-gray-500">
                       {new Date(review.createdAt).toLocaleDateString()}
                     </span>
