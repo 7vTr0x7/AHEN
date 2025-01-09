@@ -17,7 +17,7 @@ function PageOne() {
     // step - 2 Pages
     authenticationMethod: "", // To track radio button selection in step 2
     llrStatus: "",
-    license_type: "learning",
+    license_type: "driving",
     usertype: "customer",
     vendor_id: "11",
     customerprice: "",
