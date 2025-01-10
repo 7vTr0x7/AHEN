@@ -11,8 +11,12 @@ import { toggleOpenNotification } from "../redux/slices/notificationSlice";
 import Notification from "./Notification";
 import { toggleOpenUserLogin } from "../redux/slices/userSlice";
 import { getToken } from "../../utils/constants";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
+  const [error, setError] = useState("");
+  const [user, setUser] = useState(null);
+
   const [isBoxOpen, setIsBoxOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -23,7 +27,29 @@ const Navbar = () => {
   );
 
   const [location, setLocation] = useState({ city: "", town: "" });
-  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id");
+
+    if (storedUserId) {
+      const fetchProfile = async () => {
+        try {
+          const response = await fetch(
+            `https://driving.shellcode.cloud/api/users/users/${storedUserId}`
+          );
+          const data = await response.json();
+          if (data?.user) {
+            setUser(data.user);
+          }
+        } catch (error) {
+          console.error("Error fetching profile data:", error);
+          toast.error("Error fetching profile data.");
+        }
+      };
+
+      fetchProfile();
+    }
+  }, []);
 
   const fetchLocationDetails = async (lat, lon) => {
     const API_KEY = import.meta.env.VITE_MAP_API; // Replace with your API key
@@ -151,7 +177,7 @@ const Navbar = () => {
             <div className="relative">
               <img
                 alt="profile"
-                src={"https://via.placeholder.com/300"}
+                src={user?.photo || "https://via.placeholder.com/300"}
                 className="h-7 w-7 rounded-md border-2 border-gray-300 cursor-pointer"
                 onClick={() => setIsBoxOpen(!isBoxOpen)} // Toggle dropdown visibility
               />

@@ -46,6 +46,10 @@ const PaymentButtons = ({ course, sessionType }) => {
       toast.error("Please select a session type before proceeding.");
       return;
     }
+    if (!user.phone_number) {
+      toast.error("Please update user profile");
+      return;
+    }
 
     try {
       const scriptLoaded = await loadRazorpayScript();

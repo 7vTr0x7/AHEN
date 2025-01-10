@@ -19,7 +19,7 @@ const Bookings = () => {
         }
 
         const response = await fetch(
-          `http://localhost:3000/api/bookings/user/${user_id}`
+          `https://driving.shellcode.cloud/api/bookings/user/${user_id}`
         );
         const data = await response.json();
 
@@ -44,7 +44,7 @@ const Bookings = () => {
   const handleConfirmCancel = async () => {
     try {
       const response = await fetch(
-        "http://localhost:3000/api/update-cancel-booking",
+        "https://driving.shellcode.cloud/api/update-cancel-booking",
         {
           method: "PUT",
           headers: {

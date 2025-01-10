@@ -74,6 +74,8 @@ const Profile = () => {
       formData.append("photo", image); // Append the file object
     }
 
+    console.log(formData);
+
     try {
       const response = await fetch(
         "https://driving.shellcode.cloud/api/profiles/updateProfile",
