@@ -9,7 +9,7 @@ const CourseCard = ({ course }) => {
 
   return (
     <div
-      className="w-full sm:w-[280px] bg-white pt-10 md:pt-14 pb-4 px-4 shadow-lg rounded-xl flex flex-col items-center justify-center hover:scale-105 transition-transform cursor-pointer"
+      className="w-full md:w-[280px] bg-white pt-10 md:pt-14 pb-4 px-4 shadow-lg rounded-xl flex flex-col items-center justify-center hover:scale-105 transition-transform cursor-pointer"
       onClick={() =>
         navigate(`/courses/${course.title.split(":")[0].replace(" ", "-")}`, {
           state: { course },

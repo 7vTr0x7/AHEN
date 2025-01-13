@@ -81,7 +81,6 @@ const Bookings = () => {
           (booking) => booking.status.toLowerCase() === filter.toLowerCase()
         );
 
-        console.log(filteredBookings);
   return (
     <div className="bg-[#F3F4F6] pb-20 h-auto">
       <Navbar />

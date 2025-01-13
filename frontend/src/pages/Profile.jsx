@@ -226,7 +226,6 @@ const Profile = () => {
         </form>
       </div>
 
-      {/* Toaster container for notifications */}
       <Toaster />
     </div>
   );

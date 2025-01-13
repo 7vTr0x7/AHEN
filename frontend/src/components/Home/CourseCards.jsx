@@ -40,7 +40,7 @@ const CourseCards = () => {
         </p>
       </div>
       {/* Course Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {courses &&
           courses.slice(0, 4).map((course) => (
             <div key={course.id}>
