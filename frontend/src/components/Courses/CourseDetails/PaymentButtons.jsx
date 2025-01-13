@@ -46,10 +46,10 @@ const PaymentButtons = ({ course, sessionType }) => {
       toast.error("Please select a session type before proceeding.");
       return;
     }
-    if (!user.phone_number) {
-      toast.error("Please update user profile");
-      return;
-    }
+    // if (!user.phone_number) {
+    //   toast.error("Please update user profile");
+    //   return;
+    // }
 
     try {
       const scriptLoaded = await loadRazorpayScript();
@@ -143,7 +143,7 @@ const PaymentButtons = ({ course, sessionType }) => {
   return (
     <>
       <Toaster reverseOrder={false} />
-      <div className="flex w-[70%] justify-between text-xs md:text-sm text-center">
+      <div className="flex md:w-[70%] w-full justify-between text-xs md:text-sm text-center">
         {[
           {
             type: "paydaily",

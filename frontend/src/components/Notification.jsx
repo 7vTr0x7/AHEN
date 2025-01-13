@@ -34,7 +34,7 @@ const Notification = () => {
   return (
     <div className="relative">
       <div className="absolute top-[24px] right-[-3px] w-0 h-0 border-l-[13px] border-l-transparent border-r-[13px] border-r-transparent border-b-[20px] border-b-white"></div>
-      <div className="absolute top-[40px] bg-white shadow-lg p-4 w-[350px] md:w-[450px] right-[-30px] rounded-lg">
+      <div className="absolute top-[40px] bg-white shadow-lg p-4 w-[300px] md:w-[450px] right-[-30px] rounded-lg">
         <p className="text-sm font-semibold">Notifications</p>
         {notifications?.length > 0 ? (
           <div className="py-5 max-h-[280px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400">

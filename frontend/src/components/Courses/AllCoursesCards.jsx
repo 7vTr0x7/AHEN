@@ -9,7 +9,7 @@ const AllCourseCards = () => {
       const res = await fetch("https://driving.shellcode.cloud/api/courses");
 
       if (!res.ok) {
-        console.log("Failed to get session");
+        console.error("Failed to get courses");
       }
 
       const data = await res.json();
@@ -17,7 +17,7 @@ const AllCourseCards = () => {
         setCourses(data.data);
       }
     } catch (error) {
-      console.log("Error occurred while fetch session");
+      console.error("Error occurred while fetching courses", error);
     }
   };
 
@@ -26,17 +26,20 @@ const AllCourseCards = () => {
   }, []);
 
   return (
-    <div>
+    <div className="px-4 py-6">
       <div className="mb-4 flex justify-between items-center">
-        <p className="text-xl ">Courses</p>
+        <p className="text-xl font-semibold text-gray-800">Courses</p>
       </div>
-      <div className="flex flex-wrap gap-3  items-center">
-        {courses &&
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {courses.length > 0 ? (
           courses.map((course) => (
-            <div key={course.id}>
-              <CourseCard course={course} />
-            </div>
-          ))}
+            <CourseCard key={course.id} course={course} />
+          ))
+        ) : (
+          <p className="col-span-full text-center text-gray-500">
+            No courses available at the moment.
+          </p>
+        )}
       </div>
     </div>
   );

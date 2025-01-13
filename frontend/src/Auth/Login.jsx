@@ -67,7 +67,8 @@ const Login = () => {
         setFormData({ email: "", password: "" });
       } else {
         const token = data?.token;
-        const expirationTime = new Date().getTime() + 60 * 60 * 1000;
+        const expirationTime = new Date().getTime() + 15 * 24 * 60 * 60 * 1000;
+
         localStorage.setItem(
           "token",
           JSON.stringify({ value: token, expiry: expirationTime })

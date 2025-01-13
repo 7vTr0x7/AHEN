@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { FaHeart, FaStar } from "react-icons/fa6";
-import { CiHeart } from "react-icons/ci";
 import toast from "react-hot-toast";
 
 const CourseInfo = ({ course }) => {
-  const [isInWishlist, setIsInWishlist] = useState(false); // State to track if course is in wishlist
-
+  const [isInWishlist, setIsInWishlist] = useState(false); // Track if course is in wishlist
   const userId = localStorage.getItem("user_id"); // Get userId from localStorage
 
   useEffect(() => {
@@ -16,8 +14,6 @@ const CourseInfo = ({ course }) => {
             `https://driving.shellcode.cloud/api/wishlist/${userId}`
           );
           const wishlistData = await response.json();
-
-          // Check if course exists in the wishlist
           const isCourseInWishlist = wishlistData.wishlist.some(
             (item) => item.id === course.courseId
           );
@@ -29,7 +25,7 @@ const CourseInfo = ({ course }) => {
     };
 
     checkWishlist();
-  }, [userId, course.courseId]); // Re-run the check when userId or courseId changes
+  }, [userId, course.courseId]);
 
   const addOrRemoveFromWishlist = async () => {
     if (!userId) {
@@ -37,10 +33,7 @@ const CourseInfo = ({ course }) => {
       return;
     }
 
-    const courseId = course.courseId;
-    const body = { user_id: userId, course_id: courseId };
-
-    // Show loading toast
+    const body = { user_id: userId, course_id: course.courseId };
     const loadingToast = toast.loading(
       isInWishlist ? "Removing from wishlist..." : "Adding to wishlist..."
     );
@@ -51,20 +44,20 @@ const CourseInfo = ({ course }) => {
           isInWishlist ? "remove-course-from-wishlist" : "wishlist"
         }`,
         {
-          method: isInWishlist ? "DELETE" : "POST", // DELETE if in wishlist, POST if not
+          method: isInWishlist ? "DELETE" : "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         }
       );
 
       if (response.ok) {
-        const successMessage = isInWishlist
-          ? "Course removed from wishlist"
-          : "Course added to wishlist";
-        toast.success(successMessage, { id: loadingToast });
-
-        // Update wishlist state
-        setIsInWishlist(!isInWishlist); // Toggle the wishlist state
+        toast.success(
+          isInWishlist
+            ? "Course removed from wishlist"
+            : "Course added to wishlist",
+          { id: loadingToast }
+        );
+        setIsInWishlist(!isInWishlist);
       } else {
         toast.error("Failed to update wishlist", { id: loadingToast });
       }
@@ -77,40 +70,40 @@ const CourseInfo = ({ course }) => {
   };
 
   return (
-    <div className="rounded-lg flex-1 p-6 flex flex-col justify-between">
+    <div className="p-4 bg-white rounded-lg shadow-md flex flex-col gap-4">
       <div>
-        <p className="text-xl font-medium">
+        <h2 className="text-lg font-bold text-gray-900">
           {course.title || course.courseTitle}
-        </p>
-        <div className="flex items-center justify-between pr-44">
-          <div className="text-sm flex items-center gap-1 text-[#959595] mt-2">
-            <span>
-              <FaStar className="text-[#FF9F0D]" />
-            </span>
+        </h2>
+        <div className="flex items-center justify-between mt-2">
+          <div className="flex items-center gap-1 text-sm text-gray-500">
+            <FaStar className="text-yellow-500" />
             <span>{course?.starRating}</span>
-            <span className="mx-2">({course?.reviews.length} ratings)</span>
+            <span>({course?.reviews.length} ratings)</span>
           </div>
           <FaHeart
             className={`text-xl cursor-pointer ${
-              isInWishlist ? "text-red-500" : "text-gray-500"
-            }`} // Change color based on wishlist status
-            onClick={addOrRemoveFromWishlist} // Call the function to add/remove from wishlist
+              isInWishlist ? "text-red-500" : "text-gray-400"
+            }`}
+            onClick={addOrRemoveFromWishlist}
           />
         </div>
-        <div className="text-lg font-semibold flex items-center gap-3 text-[#959595] mt-2">
-          <p className="font-bold text-2xl text-black">{`₹${
-            course.price - (course.price * course.discount) / 100
-          }`}</p>
-          <span className="font-extralight line-through text-[#AAABAC]">{`₹${course.price}`}</span>
-          <p className="text-xs text-[#61C36D] font-semibold">
-            {course.discount}% off
-          </p>
-        </div>
-        <p className="text-xs text-[#AAABAC] mt-1">Inclusive of all taxes</p>
-        <p className="text-sm mt-1 font-medium text-[#616161]">
-          {course.totalSession} Sessions
-        </p>
       </div>
+      <div className="flex flex-col items-start gap-1">
+        <p className="text-2xl font-semibold text-gray-800">{`₹${
+          course.price - (course.price * course.discount) / 100
+        }`}</p>
+        <div className="flex items-center gap-2">
+          <span className="text-sm line-through text-gray-400">{`₹${course.price}`}</span>
+          <span className="text-sm text-green-600 font-medium">
+            {course.discount}% off
+          </span>
+        </div>
+        <p className="text-xs text-gray-500">Inclusive of all taxes</p>
+      </div>
+      <p className="text-sm font-medium text-gray-600">
+        {course.totalSession} Sessions
+      </p>
     </div>
   );
 };

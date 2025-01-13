@@ -51,15 +51,14 @@ const SessionBooking = () => {
       const nextDate = new Date();
       nextDate.setDate(today.getDate() + i + 1);
       return {
-        id: i, // Ensure index starts from 0
+        id: i,
         label: nextDate.toLocaleDateString("en-US", { weekday: "short" }),
-        date: nextDate.toLocaleDateString("en-US", {
-          day: "2-digit",
-        }),
+        date: nextDate.getDate().toString().padStart(2, "0"), // Ensure 2-digit format
       };
     });
   }, []);
 
+  // Available time slots
   const timeSlots = [
     "09:00 AM - 11:00 AM",
     "11:00 AM - 01:00 PM",
@@ -68,6 +67,7 @@ const SessionBooking = () => {
     "05:00 PM - 07:00 PM",
   ];
 
+  // Function to create a session
   const createSession = async () => {
     try {
       const tokenData = localStorage.getItem("token");
@@ -86,38 +86,48 @@ const SessionBooking = () => {
         return;
       }
 
-      const { value: authToken } = parsedToken; // Extract token value
+      const { value: authToken } = parsedToken;
 
-      // Determine API endpoint based on sessionType
+      // Determine API endpoint
       const apiEndpoint =
         sessionType === "group"
           ? "https://driving.shellcode.cloud/api/createGroupSession"
           : "https://driving.shellcode.cloud/api/createOneToOneSession";
 
-      // Convert selected day to YYYY-MM-DD format
+      // Ensure selectedDay is valid
       const selectedDayObj = days.find((day) => day.id === selectedDay);
-      const slot_date = selectedDayObj
-        ? new Date(`${new Date().getFullYear()}-${selectedDayObj.date}`)
-            .toISOString()
-            .split("T")[0]
-        : "";
+      if (!selectedDayObj) {
+        toast.error("Please select a valid day.");
+        return;
+      }
+
+      // Convert selected day to YYYY-MM-DD format
+      const today = new Date();
+      const slot_date = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        parseInt(selectedDayObj.date, 10)
+      )
+        .toISOString()
+        .split("T")[0];
 
       // Prepare the request body
       const requestBody = {
         course_id: course?.courseId,
         booking_date: new Date().toISOString().split("T")[0], // Current date
         slot_date, // Corrected to YYYY-MM-DD format
-        slot_time: selectedTimeSlot, // Converted to HH:MM:SS format
-        amount: 250, // Skip payment if payonce
+        slot_time: selectedTimeSlot, // User-selected time slot
+        amount: 250, // Payment amount (if applicable)
         session_id: session?.sessionId,
         session_type: sessionType === "group" ? "group" : "one-to-one",
       };
 
+      // Make API request
       const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`, // Use correct token
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify(requestBody),
         credentials: "include",
@@ -125,7 +135,7 @@ const SessionBooking = () => {
 
       const data = await response.json();
 
-      if (data.bookingData) {
+      if (data.bookingId) {
         toast.success("Session booked successfully! 🎉");
         setIsFinalView(true);
       } else {
@@ -219,28 +229,32 @@ const SessionBooking = () => {
           className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
           onClick={handleClose}></div>
 
-        <div className="absolute z-50 w-[550px] left-1/2 top-2/4 transform -translate-x-1/2 -translate-y-1/2 rounded-lg shadow-lg">
-          <div className="flex flex-col items-center w-full bg-white rounded-lg shadow-md p-8 text-center relative">
+        <div className="absolute z-50 w-[90%] sm:w-[550px] left-1/2 top-2/4 transform -translate-x-1/2 -translate-y-1/2 rounded-lg shadow-lg">
+          <div className="flex flex-col items-center w-full bg-white rounded-lg shadow-md p-6 sm:p-8 text-center relative">
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
               onClick={handleClose}>
               <AiOutlineClose size={20} />
             </button>
-            <img alt="driving" src={drivingImg} />
+            <img
+              alt="driving"
+              src={drivingImg}
+              className="w-full max-w-xs mx-auto"
+            />
             <h2 className="text-lg font-semibold mt-4">
               Booking Confirmation!
             </h2>
             <p className="text-xs text-[#797979]">
               Fasten your seat belts, your session is scheduled!
             </p>
-            <div className="text-sm font-medium mt-4 flex items-center gap-2">
+            <div className="text-sm font-medium mt-4 flex justify-center items-center gap-2">
               <p>{days.find((day) => day.id === selectedDay)?.label}</p>
               <p>{days.find((day) => day.id === selectedDay)?.date},</p>
             </div>
             <p className="text-sm font-medium">{selectedTimeSlot}</p>
 
             <button
-              className="mt-4 text-sm px-8 font-normal py-2 bg-black text-white rounded-lg"
+              className="mt-4 text-sm px-8 py-2 bg-black text-white rounded-lg"
               onClick={() => navigate("/bookings")}>
               My Course
             </button>
@@ -255,8 +269,8 @@ const SessionBooking = () => {
       <div
         className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
         onClick={() => dispatch(toggleOpenSessionBooking(false))}></div>
-      <div className="absolute z-50 w-[600px] left-1/2 top-2/4 transform -translate-x-1/2 -translate-y-1/2 rounded-lg shadow-lg">
-        <div className="w-full bg-white rounded-lg shadow-md p-6 relative">
+      <div className="absolute z-50 w-[90%] sm:w-[600px] left-1/2 top-2/4 transform -translate-x-1/2 -translate-y-1/2 rounded-lg shadow-lg">
+        <div className="w-full bg-white rounded-lg shadow-md p-6 sm:p-8 relative">
           <button
             className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
             onClick={() => dispatch(toggleOpenSessionBooking(false))}>
@@ -269,12 +283,12 @@ const SessionBooking = () => {
           {/* Day Selection */}
           <div className="mb-4">
             <h3 className="font-medium text-sm mb-2">Day</h3>
-            <div className="flex justify-between space-x-3">
+            <div className="flex flex-wrap justify-between">
               {days.map((day) => (
                 <button
                   key={day.id}
                   onClick={() => setSelectedDay(day.id)}
-                  className={`px-4 py-2 border rounded-lg text-sm ${
+                  className={`px-4 py-2 border rounded-lg text-sm mb-2 ${
                     selectedDay === day.id
                       ? "bg-black text-white"
                       : "border-gray-300 text-gray-700"
@@ -289,12 +303,12 @@ const SessionBooking = () => {
           {/* Time Slot Selection */}
           <div className="mb-6">
             <h3 className="font-medium mb-2 text-sm">Time Slot</h3>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {timeSlots.map((slot) => (
                 <button
                   key={slot}
                   onClick={() => setSelectedTimeSlot(slot)}
-                  className={`px-2 py-1 border rounded-lg text-sm ${
+                  className={`px-4 py-2 border rounded-lg text-sm ${
                     selectedTimeSlot === slot
                       ? "bg-black text-white"
                       : "text-gray-700 border-gray-300"
@@ -306,10 +320,10 @@ const SessionBooking = () => {
           </div>
 
           {/* Confirm Button */}
-          <div className="mt-12 flex justify-end">
+          <div className="mt-6 flex justify-end">
             {!isFinalView && (
               <button
-                className="px-3 bg-black text-white py-2 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 bg-black text-white py-2 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={selectedDay === null || !selectedTimeSlot}
                 onClick={handleConfirmBooking}>
                 {paymentType === "paydaily"

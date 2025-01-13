@@ -2,44 +2,28 @@ import React from "react";
 
 const CarTabNavigation = ({ activeTab, setActiveTab }) => {
   return (
-    <>
-      <div className="flex items-center gap-24  text-sm text-[#616161] md:px-10 select-none">
-        <p
-          className={`cursor-pointer ${
-            activeTab === "about" ? "text-black " : ""
+    <div className="mt-6">
+      <div className="flex md:inline-block md:justify-normal  justify-between items-center border-b border-gray-300">
+        <button
+          className={`py-2 px-4 text-sm ${
+            activeTab === "about"
+              ? "text-black font-semibold border-b-2 border-black"
+              : "text-gray-600"
           }`}
           onClick={() => setActiveTab("about")}>
-          {`About`}
-        </p>
-        <p
-          className={`cursor-pointer ${
-            activeTab === "reviews" ? "text-black " : ""
+          About
+        </button>
+        <button
+          className={`py-2 px-4 text-sm ${
+            activeTab === "reviews"
+              ? "text-black font-semibold border-b-2 border-black"
+              : "text-gray-600"
           }`}
           onClick={() => setActiveTab("reviews")}>
           Reviews
-        </p>
+        </button>
       </div>
-      <div className="flex justify-start mt-2 ">
-        <div className="flex  md:w-3/12 w-3/12 justify-between">
-          <hr
-            className={`h-[3px] ${
-              activeTab === "about"
-                ? "w-[50%] bg-black"
-                : "w-[50%] bg-[#D1D5DB]"
-            }`}
-            style={{ transition: "all 0.3s" }}
-          />
-          <hr
-            className={`h-[3px] ${
-              activeTab === "reviews"
-                ? "w-[50%] bg-black"
-                : "w-[50%] bg-[#D1D5DB]"
-            }`}
-            style={{ transition: "all 0.3s" }}
-          />
-        </div>
-      </div>
-    </>
+    </div>
   );
 };
 

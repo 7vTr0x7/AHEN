@@ -16,7 +16,11 @@ const CourseCard = ({ course }) => {
         })
       }>
       <div>
-        <img alt={course?.title} src={cardImage1} className="w-full h-32 " />
+        <img
+          alt={course?.title}
+          src={course?.image || cardImage1}
+          className="w-full h-32 "
+        />
       </div>
       <div className="bg-[#EFF0F4] mt-6 px-3 py-2 rounded-md w-full md:w-full">
         <p className="text-xs font-semibold text-start">{course?.title}</p>

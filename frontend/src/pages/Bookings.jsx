@@ -81,6 +81,7 @@ const Bookings = () => {
           (booking) => booking.status.toLowerCase() === filter.toLowerCase()
         );
 
+        console.log(filteredBookings);
   return (
     <div className="bg-[#F3F4F6] pb-20 h-auto">
       <Navbar />
@@ -89,12 +90,13 @@ const Bookings = () => {
         <div className="my-5 flex justify-between items-center">
           <p className="text-xl">Bookings</p>
         </div>
-        <div className="flex gap-4 mb-6">
+        {/* Filter Buttons - Wrap to Next Line on Mobile */}
+        <div className="w-full flex flex-wrap gap-2 mb-4 md:justify-start justify-center">
           {["All", "Completed", "Pending", "Rejected"].map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
-              className={`px-4 py-1 rounded-2xl text-sm ${
+              className={`px-4 py-2 rounded-lg text-sm ${
                 filter === status
                   ? "bg-black text-white"
                   : "bg-transparent text-black border border-black"
@@ -103,6 +105,7 @@ const Bookings = () => {
             </button>
           ))}
         </div>
+
         {filteredBookings?.length === 0 ? (
           <div className="flex justify-center items-center h-48">
             <p className="text-gray-500 text-sm">No bookings available.</p>

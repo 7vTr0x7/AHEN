@@ -9,14 +9,13 @@ const PracticeDriving = () => {
   const [selectedTab, setSelectedTab] = useState("Hatchback");
   const [currentImageIndex, setCurrentImageIndex] = useState({});
   const [isMobile, setIsMobile] = useState(false);
-  const [cars, setCars] = useState({ Hatchback: [], Sedan: [], SUV: [] }); // To store cars categorized by type
-  const [loading, setLoading] = useState(true); // For loading state
-  const [error, setError] = useState(""); // For error handling
+  const [cars, setCars] = useState({ Hatchback: [], Sedan: [], SUV: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const tabs = ["Hatchback", "Sedan", "SUV"];
 
   useEffect(() => {
-    // Fetch data from the API
     const fetchCars = async () => {
       try {
         const response = await fetch(
@@ -26,21 +25,19 @@ const PracticeDriving = () => {
 
         if (data.message) {
           const categorizedCars = { Hatchback: [], Sedan: [], SUV: [] };
-
-          // Categorize cars based on type
           data.data.forEach((car) => {
             const carType =
               car.type.charAt(0).toUpperCase() +
-              car.type.slice(1).toLowerCase(); // Normalize type
+              car.type.slice(1).toLowerCase();
 
             if (categorizedCars[carType]) {
               categorizedCars[carType].push({
                 id: car.id,
                 name: car.carname,
                 brand: car.carbrand,
-                price: "$" + (car.price || "400"), // Default price if not available
-                images: [car.image], // Use the image from the API
-                rating: car.starRating, // Use the star rating from the API
+                price: "₹" + (car.price || "400"),
+                images: [car.image],
+                rating: car.starRating,
                 about: {
                   description:
                     car.about?.description || "No description available",
@@ -84,12 +81,12 @@ const PracticeDriving = () => {
   };
 
   return (
-    <div className="bg-[#F3F4F6] pb-20 h-auto">
+    <div className="bg-[#F3F4F6] pb-20 min-h-screen">
       <Navbar />
-      <div className="px-4 sm:px-10 lg:px-24">
+      <div className="px-4 sm:px-6">
         <Breadcrumb />
-        <div className="my-5 flex justify-between items-center">
-          <p className="text-xl">Practice Driving</p>
+        <div className="my-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <h1 className="text-xl font-bold">Practice Driving</h1>
           <SearchBar />
         </div>
         <Tabs
@@ -97,7 +94,7 @@ const PracticeDriving = () => {
           selectedTab={selectedTab}
           setSelectedTab={setSelectedTab}
         />
-        <div className="mt-8">
+        <div className="mt-6">
           <CarCardGrid
             cars={cars[selectedTab]}
             currentImageIndex={currentImageIndex}

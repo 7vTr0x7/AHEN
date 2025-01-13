@@ -18,7 +18,7 @@ const CourseCards = () => {
         setCourses(data.data);
       }
     } catch (error) {
-      console.log("Error occurred while fetch session");
+      console.log("Error occurred while fetching session");
     }
   };
 
@@ -29,16 +29,18 @@ const CourseCards = () => {
   const navigate = useNavigate();
 
   return (
-    <div>
+    <div className="p-4">
+      {/* Header */}
       <div className="mb-4 flex justify-between items-center">
-        <p className="text-xl ">Courses</p>
+        <p className="text-xl font-semibold">Courses</p>
         <p
-          className="text-xs text-[#8D8D8D] cursor-pointer"
+          className="text-sm text-gray-500 cursor-pointer hover:text-gray-700 transition"
           onClick={() => navigate("/courses")}>
           View all
         </p>
       </div>
-      <div className="flex flex-wrap gap-3  items-center">
+      {/* Course Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {courses &&
           courses.slice(0, 4).map((course) => (
             <div key={course.id}>

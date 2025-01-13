@@ -110,7 +110,7 @@ const SelectSlot = ({ handleClose, car }) => {
         className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
         onClick={() => handleClose(false)}></div>
 
-      <div className="absolute z-50 w-[600px] left-1/2 top-2/4 transform -translate-x-1/2 -translate-y-1/2 rounded-lg shadow-lg">
+      <div className="absolute z-50 left-1/2 top-2/4 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-[600px] sm:w-[600px] rounded-lg shadow-lg">
         <div className="w-full bg-white rounded-lg shadow-md p-6 relative">
           <button
             className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
@@ -118,23 +118,23 @@ const SelectSlot = ({ handleClose, car }) => {
             <AiOutlineClose size={20} />
           </button>
 
-          <h2 className="text-center text-xl font-semibold mb-6">
+          <h2 className="text-center text-xl sm:text-2xl font-semibold mb-6">
             Select Slot
           </h2>
 
           <div className="mb-4">
-            <h3 className="font-medium text-sm mb-2">Day</h3>
-            <div className="flex space-x-3">
+            <h3 className="font-medium text-sm sm:text-base mb-2">Day</h3>
+            <div className="flex flex-wrap justify-between gap-3">
               {days.map((day) => (
                 <button
                   key={day.id}
                   onClick={() => handleDayClick(day.id)}
-                  className={`flex flex-col justify-center items-center w-16 h-16 border rounded-lg transition-colors duration-200 ${
+                  className={`flex flex-col justify-center items-center w-16 h-16 sm:w-20 sm:h-20 border rounded-lg transition-colors duration-200 ${
                     selectedDay === day.id
                       ? "bg-black text-white"
                       : "text-gray-700 border-gray-300"
                   }`}>
-                  <span className="text-sm">{day.label}</span>
+                  <span className="text-xs sm:text-sm">{day.label}</span>
                   <span className="font-medium text-xl">
                     {day.date.getDate()}
                   </span>
@@ -144,8 +144,8 @@ const SelectSlot = ({ handleClose, car }) => {
           </div>
 
           <div className="mb-4">
-            <h3 className="font-medium text-sm mb-2">Hours</h3>
-            <div className="flex space-x-6 text-xs">
+            <h3 className="font-medium text-sm sm:text-base mb-2">Hours</h3>
+            <div className="flex flex-wrap justify-between gap-3 text-xs sm:text-sm">
               <label className="flex items-center">
                 <input
                   type="radio"
@@ -183,13 +183,13 @@ const SelectSlot = ({ handleClose, car }) => {
           </div>
 
           <div className="mb-6">
-            <h3 className="font-medium mb-2 text-sm">Time Slot</h3>
-            <div className="grid grid-cols-3 gap-3">
+            <h3 className="font-medium mb-2 text-sm sm:text-base">Time Slot</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {timeSlots.map((slot) => (
                 <button
                   key={slot}
                   onClick={() => setSelectedTimeSlot(slot)}
-                  className={`px-2 py-1 border rounded-lg text-sm transition-colors duration-200 ${
+                  className={`px-2 py-1 border rounded-lg text-xs sm:text-sm transition-colors duration-200 ${
                     selectedTimeSlot === slot
                       ? "bg-black text-white"
                       : "text-gray-700 border-gray-300"
@@ -200,9 +200,9 @@ const SelectSlot = ({ handleClose, car }) => {
             </div>
           </div>
 
-          <div className="mt-12 flex justify-end">
+          <div className="mt-6 sm:mt-12 flex justify-end">
             <button
-              className="px-3 bg-black text-white py-2 rounded-lg text-sm"
+              className="px-3 py-2 bg-black text-white rounded-lg text-sm sm:text-base"
               onClick={handleBooking}
               disabled={selectedDay === null || !selectedTimeSlot}>
               Confirm Booking

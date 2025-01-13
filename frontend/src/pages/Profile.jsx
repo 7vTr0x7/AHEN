@@ -26,7 +26,7 @@ const Profile = () => {
           );
           const data = await response.json();
           setName(data.user.name || "");
-          setImage(data.user.photo || "");
+          setImage(data.user.photo || ""); // Ensure photo is a valid URL
           setPhoneNumber(data.user.phone_number || "");
           setEmail(data.user.email || "");
           setGender(data.user.gender || "");
@@ -47,7 +47,8 @@ const Profile = () => {
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setImage(file); // Store the file object directly
+      const imageUrl = URL.createObjectURL(file); // Create a temporary URL for the file
+      setImage(imageUrl);
     }
   };
 
@@ -73,8 +74,6 @@ const Profile = () => {
     if (image) {
       formData.append("photo", image); // Append the file object
     }
-
-    console.log(formData);
 
     try {
       const response = await fetch(
@@ -108,6 +107,14 @@ const Profile = () => {
       console.error("Error updating profile:", error);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (image) {
+        URL.revokeObjectURL(image); // Clean up the object URL
+      }
+    };
+  }, [image]);
 
   return (
     <div className="bg-[#F3F4F6] min-h-screen pb-20">

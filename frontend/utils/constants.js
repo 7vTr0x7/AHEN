@@ -7,6 +7,7 @@ export const getToken = () => {
 
   if (now > expiry) {
     localStorage.removeItem("token");
+    localStorage.removeItem("user_id");
     return null;
   }
 

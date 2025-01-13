@@ -79,7 +79,7 @@ const WishlistCards = () => {
         <p className="text-center text-gray-500">Your wishlist is empty.</p>
       ) : (
         data.map((info, index) => (
-          <div key={index} className="bg-[#F3F4F6] p-4 mb-7 rounded-lg">
+          <div key={index} className="bg-[#F3F4F6] md:p-4 p-2 mb-7 rounded-lg">
             <div className="bg-white rounded-lg relative">
               <img
                 alt={info.id}

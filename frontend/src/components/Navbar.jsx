@@ -143,7 +143,6 @@ const Navbar = () => {
                 <p className="m-0">
                   {location.city} {location.town}
                 </p>
-                <FaAngleDown />
               </div>
             </div>
           )}
@@ -226,6 +225,11 @@ const Navbar = () => {
                     className="mt-2 cursor-pointer"
                     onClick={() => navigate("/bookings")}>
                     <div className="text-sm font-semibold">Bookings</div>
+                  </div>
+                  <div
+                    className="mt-2 cursor-pointer"
+                    onClick={() => navigate("/practice-driving")}>
+                    <div className="text-sm font-semibold">Practice Driving</div>
                   </div>
                   <div className="mt-2 cursor-pointer" onClick={logoutHandler}>
                     <div className="text-sm font-semibold">Logout</div>

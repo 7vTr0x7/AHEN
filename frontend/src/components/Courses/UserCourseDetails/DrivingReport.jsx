@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { RxCross2 } from "react-icons/rx";
 import drivingImage from "../../../assets/images/driving.png";
 import { FaStar } from "react-icons/fa";
@@ -7,7 +7,6 @@ import { toggleOpenReport } from "../../../redux/slices/reportSlice";
 
 const DrivingReport = () => {
   const dispatch = useDispatch();
-
   const isReportOpen = useSelector((state) => state.report.isReportOpen);
 
   const handleCloseReport = () => {
@@ -38,7 +37,7 @@ const DrivingReport = () => {
             className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
             onClick={handleCloseReport}></div>
 
-          <div className="absolute z-50 w-[500px] h-auto left-1/2 top-[70%] transform -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white shadow-lg">
+          <div className="absolute z-50 w-[90%] sm:w-[500px] h-auto left-1/2 top-[70%] transform -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white shadow-lg">
             <div className="relative">
               <RxCross2
                 className="absolute right-3 top-3 text-xl cursor-pointer"
@@ -46,7 +45,7 @@ const DrivingReport = () => {
               />
             </div>
 
-            <div className="py-5 px-16">
+            <div className="py-5 px-8 sm:px-16">
               <p className="text-center text-xl font-semibold">{title}</p>
               <div>
                 <img
@@ -68,7 +67,7 @@ const DrivingReport = () => {
                 Your Performance
               </p>
               <div className="mt-2 w-full border-b-2 pb-3">
-                <div className="flex justify-between gap-8">
+                <div className="flex justify-between gap-4">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <div
                       key={star}
@@ -84,7 +83,7 @@ const DrivingReport = () => {
                     </div>
                   ))}
                 </div>
-                <div className="flex justify-between gap-8 text-sm text-gray-600 mt-1">
+                <div className="flex justify-between gap-4 text-sm text-gray-600 mt-1">
                   {["Bad", "Average", "Good", "Better", "Excellent"].map(
                     (label, index) => (
                       <div

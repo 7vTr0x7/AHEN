@@ -16,19 +16,23 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="bg-white rounded-lg shadow-md flex items-center gap-2 px-2 py-3 w-[250px]">
-        <CiSearch className="text-xl" />
+    <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+      <div className="flex items-center bg-white rounded-full shadow-md px-4 py-2 w-full sm:w-[300px]">
+        <CiSearch className="text-gray-500 text-2xl" />
         <input
-          className="outline-none bg-transparent text-sm"
+          type="text"
+          className="ml-2 flex-grow text-gray-700 text-sm bg-transparent outline-none placeholder-gray-400"
           placeholder="Search for vehicles"
           value={practiceDrivingSearchText}
           onChange={handleChange}
         />
       </div>
-      {/* <span className="inline-block bg-black text-white rounded-md text-4xl">
-      <HiOutlineAdjustments />
-    </span> */}
+      <button
+        className="flex items-center gap-2 px-4 py-2 text-sm bg-black text-white rounded-full shadow-md hover:bg-gray-800 transition-all duration-200"
+        aria-label="Filter options">
+        <HiOutlineAdjustments className="text-xl" />
+        Filters
+      </button>
     </div>
   );
 };

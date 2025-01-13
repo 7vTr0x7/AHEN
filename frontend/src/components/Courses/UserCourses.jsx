@@ -59,24 +59,28 @@ const UserCourses = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
   }
 
   return (
-    <div>
+    <div className="px-4 py-6">
       <div className="mb-4 flex justify-between items-center">
-        <p className="text-xl">My Courses</p>
+        <p className="text-xl font-semibold text-gray-800">My Courses</p>
       </div>
       {courses.length > 0 ? (
-        <div className="flex flex-wrap gap-3 items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {courses.map((course) => (
-            <div key={course.id}>
-              <UserCourseCard course={course} />
-            </div>
+            <UserCourseCard key={course.id} course={course} />
           ))}
         </div>
       ) : (
-        <p>No courses found.</p>
+        <div className="flex justify-center items-center h-64">
+          <p className="text-gray-500 text-center">No courses found.</p>
+        </div>
       )}
     </div>
   );
