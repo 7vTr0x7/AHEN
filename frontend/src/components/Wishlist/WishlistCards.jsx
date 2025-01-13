@@ -27,43 +27,57 @@ const WishlistCards = () => {
     fetchWishlistData();
   }, [userId]); // Effect runs when userId changes
 
-  const removeFromWishlist = async (courseId) => {
+  const removeFromWishlist = async (wishlistItem) => {
     if (!userId) {
       toast.error("User not logged in");
       return;
     }
 
+    const isCourse = wishlistItem.course !== null;
+    const apiEndpoint = isCourse
+      ? "https://driving.shellcode.cloud/api/remove-course-from-wishlist"
+      : "https://driving.shellcode.cloud/api/wishlist/remove-practise-driving";
+
     const body = {
       user_id: userId,
-      course_id: courseId,
+      [isCourse ? "course_id" : "practise_driving_id"]: isCourse
+        ? wishlistItem.course.id
+        : wishlistItem.practise_driving.id,
     };
 
     // Show loading toast
-    const loadingToast = toast.loading("Removing from wishlist...");
+    const loadingToast = toast.loading(
+      `Removing ${isCourse ? "course" : "practice driving"} from wishlist...`
+    );
 
     try {
-      const response = await fetch(
-        "https://driving.shellcode.cloud/api/remove-course-from-wishlist",
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        }
-      );
+      const response = await fetch(apiEndpoint, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
 
       if (response.ok) {
-        toast.success("Course removed from wishlist", { id: loadingToast });
+        toast.success(
+          `${isCourse ? "Course" : "Practice driving"} removed from wishlist`,
+          { id: loadingToast }
+        );
 
         // Update state to remove the item from UI
         setData((prevData) =>
-          prevData.filter((item) => item.courseId !== courseId)
+          prevData.filter(
+            (item) => item.wishlist_id !== wishlistItem.wishlist_id
+          )
         );
       } else {
-        toast.error("Failed to remove course from wishlist", {
-          id: loadingToast,
-        });
+        toast.error(
+          `Failed to remove ${
+            isCourse ? "course" : "practice driving"
+          } from wishlist`,
+          { id: loadingToast }
+        );
       }
     } catch (error) {
       console.error("Error removing from wishlist:", error);
@@ -82,23 +96,35 @@ const WishlistCards = () => {
           <div key={index} className="bg-[#F3F4F6] md:p-4 p-2 mb-7 rounded-lg">
             <div className="bg-white rounded-lg relative">
               <img
-                alt={info.id}
-                src={cardImage1}
+                alt={info.course?.title || info.practise_driving?.carname}
+                src={
+                  info.course?.image ||
+                  info.practise_driving?.image ||
+                  cardImage1
+                }
                 className="w-full rounded-lg"
               />
               <FaHeart
                 className="absolute right-2 top-2 cursor-pointer text-red-500"
-                onClick={() => removeFromWishlist(info.id)} // Call remove function
+                onClick={() => removeFromWishlist(info)} // Call remove function
               />
             </div>
-            <p className="mt-2 text-sm font-medium">{info.title}</p>
+            <p className="mt-2 text-sm font-medium">
+              {info.course?.title || info.practise_driving?.carname}
+            </p>
             <div className="flex items-center gap-4">
               <p className="font-bold">
-                ₹{info.price - (info.price * info.discount) / 100}
+                ₹
+                {info.course
+                  ? info.course.price -
+                    (info.course.price * info.course.discount) / 100
+                  : info.practise_driving?.price || "N/A"}
               </p>
-              <p className="text-xs text-[#61C36D] font-semibold">
-                {info.discount}% off
-              </p>
+              {info.course && (
+                <p className="text-xs text-[#61C36D] font-semibold">
+                  {info.course.discount}% off
+                </p>
+              )}
             </div>
           </div>
         ))

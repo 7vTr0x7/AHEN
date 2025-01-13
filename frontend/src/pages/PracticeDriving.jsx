@@ -6,14 +6,14 @@ import SearchBar from "../components/PracticeDriving/SearchBar";
 import Tabs from "../components/PracticeDriving/Tabs";
 
 const PracticeDriving = () => {
-  const [selectedTab, setSelectedTab] = useState("Hatchback");
+  const [selectedTab, setSelectedTab] = useState("hatchback");
   const [currentImageIndex, setCurrentImageIndex] = useState({});
   const [isMobile, setIsMobile] = useState(false);
-  const [cars, setCars] = useState({ Hatchback: [], Sedan: [], SUV: [] });
+  const [cars, setCars] = useState({ hatchback: [], sedan: [], suv: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const tabs = ["Hatchback", "Sedan", "SUV"];
+  const tabs = ["hatchback", "sedan", "suv"];
 
   useEffect(() => {
     const fetchCars = async () => {
@@ -24,14 +24,11 @@ const PracticeDriving = () => {
         const data = await response.json();
 
         if (data.message) {
-          const categorizedCars = { Hatchback: [], Sedan: [], SUV: [] };
+          const categorizedCars = { hatchback: [], sedan: [], suv: [] };
           data.data.forEach((car) => {
-            const carType =
-              car.type.charAt(0).toUpperCase() +
-              car.type.slice(1).toLowerCase();
-
-            if (categorizedCars[carType]) {
-              categorizedCars[carType].push({
+            const normalizedType = car.type.toLowerCase();
+            if (categorizedCars[normalizedType]) {
+              categorizedCars[normalizedType].push({
                 id: car.id,
                 name: car.carname,
                 brand: car.carbrand,
@@ -55,6 +52,7 @@ const PracticeDriving = () => {
             }
           });
 
+          // Clear the existing state to avoid accumulation
           setCars(categorizedCars);
         } else {
           setError("Failed to fetch data.");
@@ -67,7 +65,7 @@ const PracticeDriving = () => {
     };
 
     fetchCars();
-  }, []);
+  }, []); // Fetch data only once on mount
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);

@@ -26,8 +26,8 @@ const CarCardGrid = ({ cars, currentImageIndex, handleImageClick }) => {
               .includes(practiceDrivingSearchText.toLowerCase())
           )
         : cars
-      ).map((car) => (
-        <div key={car.name} className="bg-white rounded-lg shadow-md p-4">
+      ).map((car, index) => (
+        <div key={index} className="bg-white rounded-lg shadow-md p-4">
           <div className="relative w-full rounded-lg overflow-hidden">
             <img
               src={car.images[currentImageIndex[car.name] || 0]}
