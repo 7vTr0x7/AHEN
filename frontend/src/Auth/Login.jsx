@@ -11,8 +11,12 @@ const Login = () => {
   const dispatch = useDispatch();
   const isUserLoginOpen = useSelector((state) => state.user.isUserLoginOpen);
   const [isSignup, setIsSignup] = useState(false);
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const [acceptTerms, setAcceptTerms] = useState(false); // Separate state for terms
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    phone: "",
+  });
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState("");
 
   const handleOpenLogin = () => {
@@ -21,9 +25,9 @@ const Login = () => {
 
   const toggleForm = () => {
     setIsSignup((prev) => !prev);
-    setFormData({ email: "", password: "" }); // Reset form data on toggle
-    setAcceptTerms(false); // Reset terms on toggle
-    setError(""); // Clear error on toggle
+    setFormData({ email: "", password: "", phone: "" });
+    setAcceptTerms(false);
+    setError("");
   };
 
   const handleInputChange = (e) => {
@@ -35,8 +39,10 @@ const Login = () => {
     e.preventDefault();
     setError("");
 
-    if (isSignup && !acceptTerms) {
-      toast.error("You must accept the terms and conditions.");
+    if (isSignup && (!acceptTerms || !formData.phone)) {
+      toast.error(
+        "You must accept the terms and provide a valid phone number."
+      );
       return;
     }
 
@@ -64,7 +70,7 @@ const Login = () => {
       });
       if (isSignup) {
         setIsSignup(false);
-        setFormData({ email: "", password: "" });
+        setFormData({ email: "", password: "", phone: "" });
       } else {
         const token = data?.token;
         const expirationTime = new Date().getTime() + 15 * 24 * 60 * 60 * 1000;
@@ -141,20 +147,38 @@ const Login = () => {
             />
           </div>
           {isSignup && (
-            <div className="flex items-center mb-6">
-              <input
-                type="checkbox"
-                id="terms"
-                checked={acceptTerms}
-                onChange={(e) => setAcceptTerms(e.target.checked)}
-                className="w-4 h-4 mt-1 text-blue-500 border-gray-300 rounded focus:ring-blue-400"
-              />
-              <label
-                htmlFor="terms"
-                className="ml-2 text-xs text-gray-600 leading-4">
-                Accept terms and Conditions
-              </label>
-            </div>
+            <>
+              <div className="mb-4">
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-medium text-gray-600 mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="1234567890"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  required
+                />
+              </div>
+              <div className="flex items-center mb-6">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={acceptTerms}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                  className="w-4 h-4 mt-1 text-blue-500 border-gray-300 rounded focus:ring-blue-400"
+                />
+                <label
+                  htmlFor="terms"
+                  className="ml-2 text-xs text-gray-600 leading-4">
+                  Accept terms and Conditions
+                </label>
+              </div>
+            </>
           )}
           <button
             type="submit"

@@ -105,8 +105,11 @@ const DrivingDetails = () => {
               <p className="text-gray-500 text-sm">{car.brand}</p>
             </div>
             <div className="flex justify-between items-center">
-              <p className="text-lg font-semibold text-black">
-                {car.price.replace("$", "₹")}/hour
+              <p className="text-gray-500 text-sm">
+                <span className="font-bold text-lg text-black">
+                  {car.price.replace("$", "₹")}
+                </span>
+                /hour
               </p>
               <FaHeart
                 className={`text-2xl cursor-pointer ${

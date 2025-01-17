@@ -59,12 +59,17 @@ const CarCardGrid = ({ cars, currentImageIndex, handleImageClick }) => {
                 state: { car },
               })
             }>
-            <h3 className="text-lg font-semibold">{car.name}</h3>
-            <p className="text-gray-500 text-sm">{car.price}/hour</p>
-            <div className="flex items-center gap-2 mt-2">
-              <FaStar className="text-yellow-400" />
-              <span className="text-sm">{car.rating}</span>
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">{car.name}</h3>
+              <div className="flex items-center gap-2 mt-2">
+                <FaStar className="text-yellow-400" />
+                <span className="text-sm">{car.rating}</span>
+              </div>
             </div>
+            <p className="text-gray-500 text-sm">
+              <span className="font-bold text-lg text-black">{car.price}</span>
+              /hour
+            </p>
           </div>
         </div>
       ))}
