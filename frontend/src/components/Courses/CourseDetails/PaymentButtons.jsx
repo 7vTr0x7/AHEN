@@ -42,14 +42,10 @@ const PaymentButtons = ({ course, sessionType }) => {
     });
 
   const initializeRazorpay = async (amount, description, paymentType) => {
-    if (!sessionType) {
-      toast.error("Please select a session type before proceeding.");
+    if (!user.phone_number) {
+      toast.error("Please update user profile");
       return;
     }
-    // if (!user.phone_number) {
-    //   toast.error("Please update user profile");
-    //   return;
-    // }
 
     try {
       const scriptLoaded = await loadRazorpayScript();
@@ -100,7 +96,7 @@ const PaymentButtons = ({ course, sessionType }) => {
                 body: JSON.stringify({
                   user_id: userId,
                   course_id: course.courseId,
-                  sessiontype: sessionType,
+                  sessiontype: "onetoone Session",
                   paymenttype: paymentType,
                 }),
               }
@@ -119,8 +115,8 @@ const PaymentButtons = ({ course, sessionType }) => {
           }
         },
         prefill: {
-          name: user?.name,
-          email: user?.email,
+          name: user.name,
+          email: user.email,
           contact: `+91${user?.phone_number}`,
         },
         theme: { color: "#3399cc" },

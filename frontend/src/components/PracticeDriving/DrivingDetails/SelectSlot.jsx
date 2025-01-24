@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -6,9 +6,34 @@ import { useNavigate } from "react-router-dom";
 const SelectSlot = ({ handleClose, car }) => {
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-  const [selectedDuration, setSelectedDuration] = useState("1"); // New state for duration
+  const [selectedDuration, setSelectedDuration] = useState(1); // Default duration is 1 hour
+
+  const [user, setUser] = useState(null);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id");
+
+    if (storedUserId) {
+      const fetchProfile = async () => {
+        try {
+          const response = await fetch(
+            `https://driving.shellcode.cloud/api/users/users/${storedUserId}`
+          );
+          const data = await response.json();
+          if (data?.user) {
+            setUser(data.user);
+          }
+        } catch (error) {
+          console.error("Error fetching profile data:", error);
+          toast.error("Error fetching profile data.");
+        }
+      };
+
+      fetchProfile();
+    }
+  }, []);
 
   const days = useMemo(() => {
     const today = new Date();
@@ -16,9 +41,9 @@ const SelectSlot = ({ handleClose, car }) => {
       const nextDate = new Date();
       nextDate.setDate(today.getDate() + i + 1);
       return {
-        id: i, // Ensure index starts from 0
+        id: i,
         label: nextDate.toLocaleDateString("en-US", { weekday: "short" }),
-        date: nextDate, // Store the full Date object
+        date: nextDate,
       };
     });
   }, []);
@@ -31,51 +56,40 @@ const SelectSlot = ({ handleClose, car }) => {
     "05:00 PM - 07:00 PM",
   ];
 
-  const createSession = async () => {
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const createSession = async (slotDate) => {
     try {
-      const tokenData = localStorage.getItem("token");
+      const tokenData = JSON.parse(localStorage.getItem("token"));
 
-      if (!tokenData) {
-        toast.error("User not authenticated. Please log in.");
-        return;
-      }
-
-      let parsedToken;
-      try {
-        parsedToken = JSON.parse(tokenData);
-      } catch (error) {
-        console.error("Error parsing token:", error);
-        toast.error("Invalid authentication token. Please log in again.");
-        return;
-      }
-
-      const apiEndpoint = "https://driving.shellcode.cloud/api/create-booking";
-
-      // Use the full date object for slot_date
-      const selectedDayObj = days.find((day) => day.id === selectedDay);
-      const slot_date = selectedDayObj
-        ? selectedDayObj.date.toISOString().split("T")[0]
-        : "";
-
-      // Prepare the request body
       const requestBody = {
         practisedrivingid: car.id,
-        booking_date: new Date().toISOString().split("T")[0], // Current date
-        slot_date: slot_date,
+        booking_date: new Date().toISOString().split("T")[0],
+        slot_date: slotDate,
         slot_time: selectedTimeSlot,
-        status: "pending",
-        amount: Number(car.price.replace("$", "")),
+        status: "confirmed",
+        amount: car.price.replace("₹", "") * selectedDuration,
         hours: selectedDuration,
       };
+
+      const apiEndpoint = "https://driving.shellcode.cloud/api/create-booking";
 
       const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${parsedToken.value}`, // Use correct token
+          Authorization: `Bearer ${tokenData.value}`,
         },
-        body: JSON.stringify(requestBody),
         credentials: "include",
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
@@ -94,14 +108,89 @@ const SelectSlot = ({ handleClose, car }) => {
     }
   };
 
-  const handleBooking = () => {
-    if (selectedDay !== null && selectedTimeSlot) {
-      createSession();
+  const initializeRazorpay = async (amount, description, slotDate) => {
+    if (!user?.phone_number) {
+      toast.error("Please update your profile with a valid phone number.");
+      return;
+    }
+
+    try {
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        toast.error("Failed to load Razorpay. Please try again.");
+        return;
+      }
+
+      const response = await fetch(
+        "https://driving.shellcode.cloud/api/payments/create-order",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount,
+            currency: "INR",
+            receipt: `booking_receipt_${Date.now()}`,
+          }),
+        }
+      );
+
+      const { order, success } = await response.json();
+      if (!success) {
+        toast.error("Failed to create Razorpay order. Please try again.");
+        return;
+      }
+
+      const options = {
+        key: "rzp_test_3sEAtEoClhTs62",
+        amount: order.amount,
+        currency: "INR",
+        name: car.name,
+        description,
+        order_id: order.id,
+        handler: async () => {
+          toast.success("Payment successful! Proceeding to book session...");
+          await createSession(slotDate);
+        },
+        prefill: {
+          name: user.name,
+          email: user.email,
+          contact: `+91${user.phone_number}`,
+        },
+        theme: { color: "#3399cc" },
+      };
+
+      const razorpay = new window.Razorpay(options);
+
+      razorpay.on("payment.failed", (error) => {
+        console.error("Payment failed:", error);
+        toast.error("Payment failed. Please try again.");
+      });
+
+      razorpay.open();
+    } catch (error) {
+      console.error("Error initializing Razorpay:", error);
+      toast.error("An unexpected error occurred. Please try again.");
     }
   };
 
-  const handleDayClick = (dayId) => {
-    setSelectedDay(dayId);
+  const handleBooking = () => {
+    if (selectedDay !== null && selectedTimeSlot) {
+      const selectedDayObj = days.find((day) => day.id === selectedDay);
+      const slotDate = selectedDayObj
+        ? selectedDayObj.date.toISOString().split("T")[0]
+        : "";
+
+      const baseAmount = Number(car.price.replace("₹", ""));
+      const totalAmount = baseAmount; // Razorpay requires amount in paise
+
+      initializeRazorpay(
+        totalAmount,
+        `Booking for ${car.name} (${selectedDuration} hours)`,
+        slotDate
+      );
+    } else {
+      toast.error("Please select a day and time slot before proceeding.");
+    }
   };
 
   return (
@@ -122,13 +211,14 @@ const SelectSlot = ({ handleClose, car }) => {
             Select Slot
           </h2>
 
+          {/* Day Selection */}
           <div className="mb-4">
             <h3 className="font-medium text-sm sm:text-base mb-2">Day</h3>
             <div className="flex flex-wrap justify-between gap-3">
               {days.map((day) => (
                 <button
                   key={day.id}
-                  onClick={() => handleDayClick(day.id)}
+                  onClick={() => setSelectedDay(day.id)}
                   className={`flex flex-col justify-center items-center w-16 h-16 sm:w-20 sm:h-20 border rounded-lg transition-colors duration-200 ${
                     selectedDay === day.id
                       ? "bg-black text-white"
@@ -143,46 +233,28 @@ const SelectSlot = ({ handleClose, car }) => {
             </div>
           </div>
 
-          <div className="mb-4">
-            <h3 className="font-medium text-sm sm:text-base mb-2">Hours</h3>
-            <div className="flex flex-wrap justify-between gap-3 text-xs sm:text-sm">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="duration"
-                  value="1"
-                  checked={selectedDuration === "1"}
-                  onChange={(e) => setSelectedDuration(e.target.value)}
-                  className="mr-2"
-                />
-                01 Hour
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="duration"
-                  value="2"
-                  checked={selectedDuration === "2"}
-                  onChange={(e) => setSelectedDuration(e.target.value)}
-                  className="mr-2"
-                />
-                02 Hours
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="duration"
-                  value="3"
-                  checked={selectedDuration === "3"}
-                  onChange={(e) => setSelectedDuration(e.target.value)}
-                  className="mr-2"
-                />
-                03 Hours
-              </label>
+          <div className="mb-6">
+            <h3 className="font-medium mb-2 text-sm sm:text-base">
+              Duration (hours)
+            </h3>
+            <div className="flex gap-3">
+              {[1, 2, 3, 4].map((hour) => (
+                <button
+                  key={hour}
+                  onClick={() => setSelectedDuration(hour)}
+                  className={`px-3 py-2 border rounded-lg text-sm sm:text-base transition-colors duration-200 ${
+                    selectedDuration === hour
+                      ? "bg-black text-white"
+                      : "text-gray-700 border-gray-300"
+                  }`}>
+                  {hour} Hour{hour > 1 ? "s" : ""}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="mb-6">
+          {/* Time Slot Selection */}
+          <div className="mb-4">
             <h3 className="font-medium mb-2 text-sm sm:text-base">Time Slot</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {timeSlots.map((slot) => (
@@ -200,6 +272,9 @@ const SelectSlot = ({ handleClose, car }) => {
             </div>
           </div>
 
+          {/* Duration Selection */}
+
+          {/* Confirm Booking Button */}
           <div className="mt-6 sm:mt-12 flex justify-end">
             <button
               className="px-3 py-2 bg-black text-white rounded-lg text-sm sm:text-base"

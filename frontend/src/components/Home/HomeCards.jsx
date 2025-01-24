@@ -1,5 +1,7 @@
 import React from "react";
 import cardImage1 from "../../assets/images/homeCardImage.png";
+import cardImage2 from "../../assets/images/practiceDriving.png";
+import cardImage3 from "../../assets/images/License.png";
 import { useNavigate } from "react-router-dom";
 
 const HomeCards = () => {
@@ -8,18 +10,21 @@ const HomeCards = () => {
       id: "1",
       title: "Driving Zero to Hero",
       des: "Learn driving right from basics & become a Master.",
+      image: cardImage1,
       route: "/courses",
     },
     {
       id: "2",
       title: "Licensing",
       des: "Get your driving license at the comfort of your home.",
+      image: cardImage3,
       route: "/driving-license",
     },
     {
       id: "3",
       title: "Practice driving",
       des: "Get hands on experience on a vehicle & sharpen your skills.",
+      image: cardImage2,
       route: "/practice-driving",
     },
   ];
@@ -34,7 +39,7 @@ const HomeCards = () => {
           key={info.id}
           onClick={() => navigate(info.route)}>
           <div>
-            <img alt={info.title} src={cardImage1} className="w-full h-32 " />
+            <img alt={info.title} src={info.image} className="w-full h-32 " />
           </div>
           <p className="text-lg font-bold mt-6">{info.title}</p>
           <p className="text-sm text-[#959595] mt-2">{info.des}</p>

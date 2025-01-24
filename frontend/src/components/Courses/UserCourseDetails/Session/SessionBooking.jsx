@@ -70,29 +70,11 @@ const SessionBooking = () => {
   // Function to create a session
   const createSession = async () => {
     try {
-      const tokenData = localStorage.getItem("token");
-
-      if (!tokenData) {
-        toast.error("User not authenticated. Please log in.");
-        return;
-      }
-
-      let parsedToken;
-      try {
-        parsedToken = JSON.parse(tokenData);
-      } catch (error) {
-        console.error("Error parsing token:", error);
-        toast.error("Invalid authentication token. Please log in again.");
-        return;
-      }
-
-      const { value: authToken } = parsedToken;
+      const tokenData = JSON.parse(localStorage.getItem("token"));
 
       // Determine API endpoint
       const apiEndpoint =
-        sessionType === "group"
-          ? "https://driving.shellcode.cloud/api/createGroupSession"
-          : "https://driving.shellcode.cloud/api/createOneToOneSession";
+        "https://driving.shellcode.cloud/api/createOneToOneSession";
 
       // Ensure selectedDay is valid
       const selectedDayObj = days.find((day) => day.id === selectedDay);
@@ -119,7 +101,7 @@ const SessionBooking = () => {
         slot_time: selectedTimeSlot, // User-selected time slot
         amount: 250, // Payment amount (if applicable)
         session_id: session?.sessionId,
-        session_type: sessionType === "group" ? "group" : "one-to-one",
+        session_type: "one-to-one",
       };
 
       // Make API request
@@ -127,7 +109,7 @@ const SessionBooking = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${tokenData.value}`,
         },
         body: JSON.stringify(requestBody),
         credentials: "include",
@@ -135,7 +117,7 @@ const SessionBooking = () => {
 
       const data = await response.json();
 
-      if (data.bookingId) {
+      if (data.bookingData) {
         toast.success("Session booked successfully! 🎉");
         setIsFinalView(true);
       } else {
@@ -160,6 +142,10 @@ const SessionBooking = () => {
   };
 
   const initializeRazorpay = async (amount, description) => {
+    if (!user.phone_number) {
+      toast.error("Please update user profile");
+      return;
+    }
     try {
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";

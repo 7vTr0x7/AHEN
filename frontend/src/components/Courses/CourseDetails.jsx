@@ -35,10 +35,7 @@ const CourseDetails = () => {
           </div>
           <div className="md:col-span-1 col-span-2">
             <CourseInfo course={course} />
-            <SessionButtons
-              setSessionType={setSessionType}
-              sessionType={sessionType}
-            />
+
             <hr className="md:w-[70%] w-full my-6 h-[2px] bg-black" />
 
             <PaymentButtons course={course} sessionType={sessionType} />

@@ -46,6 +46,18 @@ const Login = () => {
       return;
     }
 
+    if (
+      isSignup &&
+      (formData.phone.length < 10 || formData.phone.length > 10)
+    ) {
+      toast.error("You must enter a valid phone number.");
+      return;
+    }
+    if (formData.password.length < 6) {
+      toast.error("password should be 6 or more characters");
+      return;
+    }
+
     const toastId = toast.loading(isSignup ? "Signing up..." : "Logging in...");
     const url = isSignup
       ? "https://driving.shellcode.cloud/api/users/signup"
@@ -55,7 +67,7 @@ const Login = () => {
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, phone_number: formData.phone }),
       });
 
       if (!response.ok) {
@@ -81,6 +93,7 @@ const Login = () => {
         );
 
         localStorage.setItem("user_id", data?.userId);
+        localStorage.setItem("userData", JSON.stringify(formData));
 
         handleOpenLogin();
       }

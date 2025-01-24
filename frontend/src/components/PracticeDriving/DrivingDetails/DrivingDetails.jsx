@@ -90,7 +90,7 @@ const DrivingDetails = () => {
         <div className="grid md:grid-cols-2 gap-4 mt-4">
           {/* Car Image */}
           <div>
-            <CarImage car={car} image={car.images[0]} />
+            <CarImage car={car} image={car.images} />
           </div>
           {/* Car Details */}
           <div className="pt-4 space-y-4">
@@ -107,7 +107,7 @@ const DrivingDetails = () => {
             <div className="flex justify-between items-center">
               <p className="text-gray-500 text-sm">
                 <span className="font-bold text-lg text-black">
-                  {car.price.replace("$", "₹")}
+                  {car?.price?.replace("$", "₹")}
                 </span>
                 /hour
               </p>

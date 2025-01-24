@@ -22,18 +22,21 @@ const Profile = () => {
       const fetchProfile = async () => {
         try {
           const response = await fetch(
-            `https://driving.shellcode.cloud/api/users/users/${storedUserId}`
+            `https://driving.shellcode.cloud/api/profiles/profile/${storedUserId}`
           );
           const data = await response.json();
-          setName(data.user.name || "");
-          setImage(data.user.photo || ""); // Ensure photo is a valid URL
-          setPhoneNumber(data.user.phone_number || "");
-          setEmail(data.user.email || "");
-          setGender(data.user.gender || "");
-          const formattedDob = data.user.date_of_birth
-            ? new Date(data.user.date_of_birth).toISOString().split("T")[0]
-            : "";
-          setDob(formattedDob);
+          const userData = JSON.parse(localStorage.getItem("userData"));
+          if (data?.profile) {
+            setName(data.profile.name || "");
+            setImage(data.profile.photo || ""); // Ensure photo is a valid URL
+            setPhoneNumber(data.profile.phone_number || "");
+            setEmail(userData.email || "");
+            setGender(data.profile.gender || "");
+            const formattedDob = data.profile.date_of_birth
+              ? new Date(data.profile.date_of_birth).toISOString().split("T")[0]
+              : "";
+            setDob(formattedDob);
+          }
         } catch (error) {
           console.error("Error fetching profile data:", error);
           toast.error("Error fetching profile data.");
@@ -43,6 +46,8 @@ const Profile = () => {
       fetchProfile();
     }
   }, []);
+
+  console.log(image);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -55,14 +60,15 @@ const Profile = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Show loading toast
+    if (phoneNumber.length < 10 || phoneNumber.length > 10) {
+      toast.error("You must enter a valid phone number.");
+      return;
+    }
+    const userId = localStorage.getItem("user_id"); // Get user_id from local storage
+    if (!userId) return;
+
     const loadingToast = toast.loading("Updating profile...");
 
-    // Retrieve the bearer token from localStorage
-    const token = localStorage.getItem("token");
-    const { value } = JSON.parse(token);
-
-    // Create form data for the request
     const formData = new FormData();
     formData.append("name", name);
     formData.append("phone_number", phoneNumber);
@@ -70,6 +76,7 @@ const Profile = () => {
     formData.append("gender", gender);
     const formattedDob = new Date(dob).toISOString().split("T")[0]; // This will format it as 'YYYY-MM-DD'
     formData.append("date_of_birth", formattedDob);
+    formData.append("user_id", userId);
 
     if (image) {
       formData.append("photo", image); // Append the file object
@@ -77,12 +84,10 @@ const Profile = () => {
 
     try {
       const response = await fetch(
-        "https://driving.shellcode.cloud/api/profiles/updateProfile",
+        `https://driving.shellcode.cloud/api/profiles/updateProfile`,
         {
           method: "PUT",
-          headers: {
-            Authorization: `Bearer ${value}`, // Add token in the Authorization header
-          },
+
           body: formData, // FormData handles the multipart/form-data
         }
       );

@@ -1,20 +1,76 @@
-import React, { useState } from "react";
-import { FaIdCard, FaSignature, FaFileAlt } from "react-icons/fa";
-import { toast } from "react-hot-toast"; // Importing react-hot-toast
-import Navbar from "../Navbar";
+import React, { useState, useEffect } from "react";
+import { FaIdCard } from "react-icons/fa";
+import { toast } from "react-hot-toast";
+import Navbar from "./../Navbar";
+import { useNavigate } from "react-router-dom";
 
 const PageOne = () => {
   const [step, setStep] = useState(1);
   const [vehicleType, setVehicleType] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [qualification, setQualification] = useState("");
   const [uploads, setUploads] = useState({
-    aadhaarFront: null,
-    aadhaarBack: null,
-    signature: null,
-    llPhoto: null, // New state for Learning License photo
+    llPhoto: null,
   });
+  const [price, setPrice] = useState(0);
   const [isPayed, setIsPayed] = useState(false);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  // Fetch user profile on component load
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id");
+
+    if (storedUserId) {
+      const fetchProfile = async () => {
+        try {
+          const response = await fetch(
+            `https://driving.shellcode.cloud/api/users/users/${storedUserId}`
+          );
+          const data = await response.json();
+          if (data?.user) {
+            setUser(data.user);
+          } else {
+            toast.error("User data not found.");
+          }
+        } catch (error) {
+          console.error("Error fetching profile data:", error);
+          toast.error("Error fetching profile data.");
+        }
+      };
+
+      fetchProfile();
+    } else {
+      toast.error("User not logged in.");
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  // Fetch price dynamically
+  useEffect(() => {
+    const fetchPrice = async () => {
+      try {
+        const response = await fetch(
+          "https://driving.shellcode.cloud/license/licenses/price"
+        );
+        const data = await response.json();
+        if (response.ok && data?.data) {
+          const drivingPrice = data.data.find(
+            (item) => item.price_type === "driving_license_customer_price"
+          );
+          if (drivingPrice) {
+            setPrice(parseFloat(drivingPrice.price));
+          } else {
+            toast.error("Price data not found.");
+          }
+        } else {
+          toast.error("Failed to fetch price data.");
+        }
+      } catch (error) {
+        toast.error("An error occurred while fetching price data.");
+      }
+    };
+
+    fetchPrice();
+  }, []);
 
   const handleFileUpload = (e, key) => {
     if (e.target.files && e.target.files[0]) {
@@ -25,32 +81,31 @@ const PageOne = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      !vehicleType ||
-      !mobileNumber ||
-      !uploads.aadhaarFront ||
-      !uploads.aadhaarBack ||
-      !uploads.signature ||
-      !uploads.llPhoto
-    ) {
+    // Ensure user details are complete
+    if (!user?.phone_number) {
+      toast.error("Please update your profile with a valid phone number.");
+      return;
+    }
+
+    if (!vehicleType || !uploads.llPhoto) {
       toast.error(
-        "Please fill in all required fields and upload necessary files."
+        "Please select a vehicle type and upload the required Learning License photo."
       );
       return;
     }
 
+    const storedUserId = localStorage.getItem("user_id");
+
     const formDataObj = new FormData();
-    formDataObj.append("vehicleType", vehicleType);
-    formDataObj.append("mobileNumber", mobileNumber);
-    formDataObj.append("qualification", qualification);
-    formDataObj.append("aadhaarFront", uploads.aadhaarFront);
-    formDataObj.append("aadhaarBack", uploads.aadhaarBack);
-    formDataObj.append("signature", uploads.signature);
-    formDataObj.append("llPhoto", uploads.llPhoto); // Appending LL photo to FormData
+    formDataObj.append("license_type", "driving");
+    formDataObj.append("vehicle_type", vehicleType);
+    formDataObj.append("LL_photo", uploads.llPhoto); // Appending the file
+    formDataObj.append("payment_filed", price.toString());
+    formDataObj.append("user_id", storedUserId);
 
     try {
       const response = await fetch(
-        "https://driving.shellcode.cloud/license/create",
+        "https://driving.shellcode.cloud/license/driving/create",
         {
           method: "POST",
           body: formDataObj,
@@ -59,9 +114,11 @@ const PageOne = () => {
 
       if (response.ok) {
         const responseData = await response.json();
-        console.log("Submission successful:", responseData);
-        toast.success("Data added successfully!");
-        setIsPayed(true); // Display submit button after successful payment
+        console.log(responseData);
+        if (responseData.success) {
+          toast.success("Data added successfully!");
+          navigate("/"); // Navigate to home after success
+        }
       } else {
         toast.error("Submission failed. Please try again.");
       }
@@ -108,17 +165,17 @@ const PageOne = () => {
           key: "rzp_test_3sEAtEoClhTs62",
           amount: data.order.amount,
           currency: "INR",
-          name: "Ahen",
+          name: "Driving License",
           description,
           order_id: data.order.id,
+          prefill: {
+            name: user?.name || "",
+            email: user?.email || "",
+            contact: `+91${user?.phone_number}`,
+          },
           handler: async () => {
             toast.success("Payment successful! 🎉");
             setIsPayed(true);
-          },
-          prefill: {
-            name: "User Name", // Replace with actual user data
-            email: "user@example.com", // Replace with actual user data
-            contact: "1234567890", // Replace with actual user data
           },
           theme: { color: "#3399cc" },
         };
@@ -138,14 +195,14 @@ const PageOne = () => {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col items-center justify-center h-screen p-4 bg-gray-100">
+      <div className="flex h-screen flex-col items-center justify-center bg-gray-100 p-4">
         {step === 1 && (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-2  md:justify-center">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:justify-center lg:grid-cols-2">
             {["2 Wheeler", "4 Wheeler", "T-Permit", "2 & 4 Wheeler"].map(
               (type) => (
                 <button
                   key={type}
-                  className="p-6 text-center bg-white border border-gray-300 shadow-lg rounded-lg hover:bg-blue-100 transition duration-300 ease-in-out transform hover:scale-105"
+                  className="transform rounded-lg border border-gray-300 bg-white p-6 text-center shadow-lg transition duration-300 ease-in-out hover:scale-105 hover:bg-blue-100"
                   onClick={() => {
                     setVehicleType(type);
                     setStep(2);
@@ -157,106 +214,50 @@ const PageOne = () => {
           </div>
         )}
 
-        {step === 2 && !isPayed && (
+        {step === 2 && (
           <form
-            className="w-full max-w-lg space-y-6 mt-8 p-6 bg-white rounded-lg shadow-lg"
+            className="mt-8 w-full max-w-lg space-y-6 rounded-lg bg-white p-6 shadow-lg"
             onSubmit={handleSubmit}>
-            <div>
-              <label
-                htmlFor="mobile"
-                className="block mb-2 text-lg font-medium text-gray-700">
-                Mobile Number (Aadhaar linked){" "}
-                <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="mobile"
-                type="text"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter mobile number"
-                value={mobileNumber}
-                onChange={(e) => setMobileNumber(e.target.value)}
-                required
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="qualification"
-                className="block mb-2 text-lg font-medium text-gray-700">
-                Qualification
-              </label>
-              <select
-                id="qualification"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                value={qualification}
-                onChange={(e) => setQualification(e.target.value)}>
-                <option value="">Select Qualification</option>
-                {["10th", "12th", "Graduate", "Post Graduate"].map((qual) => (
-                  <option key={qual} value={qual}>
-                    {qual}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             <div className="space-y-4">
-              {[
-                {
-                  label: "Aadhaar Card Front",
-                  key: "aadhaarFront",
-                  icon: FaIdCard,
-                },
-                {
-                  label: "Aadhaar Card Back",
-                  key: "aadhaarBack",
-                  icon: FaFileAlt,
-                },
-                { label: "Signature", key: "signature", icon: FaSignature },
-                {
-                  label: "Learning License Photo (LL)",
-                  key: "llPhoto",
-                  icon: FaIdCard,
-                }, // New field for LL photo
-              ].map(({ label, key, icon: Icon }) => (
-                <div key={key} className="flex items-center space-x-4">
-                  <Icon size={24} className="text-gray-500" />
-                  <label htmlFor={key} className="flex-1 text-lg text-gray-700">
-                    {label}
-                  </label>
-                  <input
-                    id={key}
-                    type="file"
-                    className="w-40 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    onChange={(e) => handleFileUpload(e, key)}
-                    accept=".jpg,.png,.pdf"
-                    required={key !== "qualification"} // Make all fields required except qualification
-                  />
-                </div>
-              ))}
+              <div className="flex items-center space-x-4">
+                <FaIdCard size={24} className="text-gray-500" />
+                <label
+                  htmlFor="llPhoto"
+                  className="flex-1 text-lg text-gray-700">
+                  Learning License Photo (LL)
+                </label>
+                <input
+                  id="llPhoto"
+                  type="file"
+                  className="w-40 rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) => handleFileUpload(e, "llPhoto")}
+                  accept=".jpg,.png,.pdf"
+                  required
+                />
+              </div>
             </div>
 
             {/* Display the price */}
-            <div className="text-center text-lg font-semibold text-gray-800 mt-4">
+            <div className="mt-4 text-center text-lg font-semibold text-gray-800">
               <p>
-                Total Price: <span className="text-blue-500">₹1000</span>
+                Total Price: <span className="text-blue-500">₹{price}</span>
               </p>
             </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out"
-              onClick={() => initializeRazorpay(1000, "Driving License")}>
-              Proceed to Payment
-            </button>
+            {isPayed ? (
+              <button
+                onClick={handleSubmit}
+                className="w-full py-3 text-white bg-green-500 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
+                Submit
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="w-full py-3 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out"
+                onClick={() => initializeRazorpay(price, "Learning License")}>
+                Proceed to Payment
+              </button>
+            )}
           </form>
-        )}
-
-        {isPayed && (
-          <button
-            onClick={handleSubmit}
-            className="w-full py-3 text-white bg-green-500 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
-            Submit
-          </button>
         )}
       </div>
     </>

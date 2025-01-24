@@ -27,12 +27,12 @@ const SearchBar = () => {
           onChange={handleChange}
         />
       </div>
-      <button
+      {/* <button
         className="flex items-center gap-2 px-4 py-2 text-sm bg-black text-white rounded-full shadow-md hover:bg-gray-800 transition-all duration-200"
         aria-label="Filter options">
         <HiOutlineAdjustments className="text-xl" />
         Filters
-      </button>
+      </button> */}
     </div>
   );
 };

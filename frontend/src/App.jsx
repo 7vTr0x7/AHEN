@@ -46,6 +46,8 @@ const App = () => {
       className={`font-aeonik relative h-screen ${
         isWishlistOpen || isUserLoginOpen ? "overflow-hidden" : ""
       }`}>
+      <Toaster />
+
       <Router>
         <Suspense fallback={<Loading />}>
           <Routes>

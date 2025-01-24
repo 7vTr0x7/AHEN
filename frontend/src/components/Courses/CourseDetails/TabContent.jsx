@@ -19,7 +19,7 @@ const TabContent = ({ activeTab, course, toggleDropdown, openIndex }) => {
       <div className="md:col-span-1 col-span-2 rounded-lg">
         {activeTab === "courseContent" ? (
           <div className="mx-auto">
-            {course.content.length > 0 &&
+            {course?.content?.length > 0 &&
               course.content.map((day, index) => (
                 <div
                   key={index}

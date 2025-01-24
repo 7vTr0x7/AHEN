@@ -35,11 +35,13 @@ const WishlistCards = () => {
 
     const isCourse = wishlistItem.course !== null;
     const apiEndpoint = isCourse
-      ? "https://driving.shellcode.cloud/api/remove-course-from-wishlist"
+      ? "https://driving.shellcode.cloud/api/wishlist/remove-course-from-wishlist"
       : "https://driving.shellcode.cloud/api/wishlist/remove-practise-driving";
 
     const body = {
       user_id: userId,
+
+      wishlist_id: wishlistItem.wishlist_id,
       [isCourse ? "course_id" : "practise_driving_id"]: isCourse
         ? wishlistItem.course.id
         : wishlistItem.practise_driving.id,

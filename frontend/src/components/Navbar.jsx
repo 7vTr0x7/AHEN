@@ -35,11 +35,11 @@ const Navbar = () => {
       const fetchProfile = async () => {
         try {
           const response = await fetch(
-            `https://driving.shellcode.cloud/api/users/users/${storedUserId}`
+            `https://driving.shellcode.cloud/api/profiles/profile/${storedUserId}`
           );
           const data = await response.json();
-          if (data?.user) {
-            setUser(data.user);
+          if (data?.profile) {
+            setUser(data.profile);
           }
         } catch (error) {
           console.error("Error fetching profile data:", error);
@@ -229,7 +229,9 @@ const Navbar = () => {
                   <div
                     className="mt-2 cursor-pointer"
                     onClick={() => navigate("/practice-driving")}>
-                    <div className="text-sm font-semibold">Practice Driving</div>
+                    <div className="text-sm font-semibold">
+                      Practice Driving
+                    </div>
                   </div>
                   <div className="mt-2 cursor-pointer" onClick={logoutHandler}>
                     <div className="text-sm font-semibold">Logout</div>

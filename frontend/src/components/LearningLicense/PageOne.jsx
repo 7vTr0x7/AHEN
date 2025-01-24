@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { FaIdCard, FaSignature, FaFileAlt } from "react-icons/fa";
-import { toast } from "react-hot-toast"; // Importing react-hot-toast
+import React, { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom"; // Added for navigation
 import Navbar from "../Navbar";
 
 const PageOne = () => {
@@ -13,7 +13,61 @@ const PageOne = () => {
     aadhaarBack: null,
     signature: null,
   });
+  const [price, setPrice] = useState(0);
   const [isPayed, setIsPayed] = useState(false);
+  const [user, setUser] = useState(null);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id");
+
+    if (storedUserId) {
+      const fetchProfile = async () => {
+        try {
+          const response = await fetch(
+            `https://driving.shellcode.cloud/api/users/users/${storedUserId}`
+          );
+          const data = await response.json();
+          if (data?.user) {
+            setUser(data.user);
+          }
+        } catch (error) {
+          console.error("Error fetching profile data:", error);
+          toast.error("Error fetching profile data.");
+        }
+      };
+
+      fetchProfile();
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchPrice = async () => {
+      try {
+        const response = await fetch(
+          "https://driving.shellcode.cloud/license/licenses/price"
+        );
+        const data = await response.json();
+        if (response.ok && data?.data) {
+          const learningPrice = data.data.find(
+            (item) => item.price_type === "learning_license_customer_price"
+          );
+          if (learningPrice) {
+            setPrice(parseFloat(learningPrice.price));
+          } else {
+            toast.error("Price data not found.");
+          }
+        } else {
+          toast.error("Failed to fetch price data.");
+        }
+      } catch (error) {
+        toast.error("An error occurred while fetching price data.");
+      }
+    };
+
+    fetchPrice();
+  }, []);
 
   const handleFileUpload = (e, key) => {
     if (e.target.files && e.target.files[0]) {
@@ -23,6 +77,12 @@ const PageOne = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const storedUserId = localStorage.getItem("user_id");
+    if (!storedUserId) {
+      toast.error("User ID not found. Please log in again.");
+      return;
+    }
 
     if (
       !vehicleType ||
@@ -38,98 +98,107 @@ const PageOne = () => {
     }
 
     const formDataObj = new FormData();
-    formDataObj.append("vehicleType", vehicleType);
-    formDataObj.append("mobileNumber", mobileNumber);
-    formDataObj.append("qualification", qualification);
-    formDataObj.append("aadhaarFront", uploads.aadhaarFront);
-    formDataObj.append("aadhaarBack", uploads.aadhaarBack);
-    formDataObj.append("signature", uploads.signature);
+    formDataObj.append("license_type", "learning");
+    formDataObj.append("vehicle_type", vehicleType);
+    formDataObj.append("mobile_number", mobileNumber);
+    formDataObj.append("qualification", qualification || "");
+    formDataObj.append(
+      "aadhar_front_photo",
+      uploads.aadhaarFront,
+      uploads.aadhaarFront.name
+    );
+    formDataObj.append(
+      "aadhar_back_photo",
+      uploads.aadhaarBack,
+      uploads.aadhaarBack.name
+    );
+    formDataObj.append(
+      "signature_photo",
+      uploads.signature,
+      uploads.signature.name
+    );
+    formDataObj.append("payment_filed", price.toString());
+    formDataObj.append("user_id", storedUserId);
 
     try {
       const response = await fetch(
-        "https://driving.shellcode.cloud/license/create",
+        "https://driving.shellcode.cloud/license/learning/create",
         {
           method: "POST",
           body: formDataObj,
         }
       );
 
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log("Submission successful:", responseData);
-        toast.success("Data added successfully!");
-        setIsPayed(true); // Display submit button after successful payment
+      const responseData = await response.json();
+      console.log(responseData);
+      if (response.ok && responseData.success) {
+        toast.success(responseData.message);
+        navigate("/"); // Navigate to home after success
       } else {
-        toast.error("Submission failed. Please try again.");
+        toast.error(
+          responseData.message || "Submission failed. Please try again."
+        );
       }
     } catch (error) {
-      console.error("Error during form submission:", error);
       toast.error("An error occurred. Please try again.");
     }
   };
 
   const initializeRazorpay = async (amount, description) => {
-    try {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.async = true;
-      document.body.appendChild(script);
-
-      script.onload = async () => {
-        const tokenData = localStorage.getItem("token");
-        const { value } = JSON.parse(tokenData);
-        const response = await fetch(
-          "https://driving.shellcode.cloud/api/payments/create-order",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${value}`,
-            },
-            body: JSON.stringify({
-              amount,
-              currency: "INR",
-              receipt: "receipt#1",
-            }),
-            credentials: "include",
-          }
-        );
-
-        const data = await response.json();
-        if (!data.success) {
-          toast.error("Failed to create order. Please try again.");
-          return;
-        }
-
-        const options = {
-          key: "rzp_test_3sEAtEoClhTs62",
-          amount: data.order.amount,
-          currency: "INR",
-          name: "Ahen",
-          description,
-          order_id: data.order.id,
-          handler: async () => {
-            toast.success("Payment successful! 🎉");
-            setIsPayed(true);
-          },
-          prefill: {
-            name: "User Name", // Replace with actual user data
-            email: "user@example.com", // Replace with actual user data
-            contact: "1234567890", // Replace with actual user data
-          },
-          theme: { color: "#3399cc" },
-        };
-
-        const razorpay = new window.Razorpay(options);
-        razorpay.on("payment.failed", () =>
-          toast.error("Payment failed. Please try again.")
-        );
-        razorpay.open();
-      };
-    } catch (error) {
-      console.error("Error initializing Razorpay:", error);
-      toast.error("An unexpected error occurred. Please try again.");
+    if (!user.phone_number) {
+      toast.error("Please update user profile");
+      return;
     }
+
+    const tokenData = localStorage.getItem("token");
+    const { value } = JSON.parse(tokenData);
+    const response = await fetch(
+      "https://driving.shellcode.cloud/api/payments/create-order",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${value}`,
+        },
+        body: JSON.stringify({
+          amount,
+          currency: "INR",
+          receipt: "receipt#1",
+        }),
+        credentials: "include",
+      }
+    );
+
+    const data = await response.json();
+    if (!data.success) {
+      toast.error("Failed to create order. Please try again.");
+      return;
+    }
+
+    const options = {
+      key: "rzp_test_3sEAtEoClhTs62",
+      amount: data.order.amount,
+      currency: "INR",
+      name: "Ahen",
+      description,
+      order_id: data.order.id,
+      handler: async () => {
+        toast.success("Payment successful!");
+        setIsPayed(true); // Update the button after payment success
+      },
+      prefill: {
+        name: user.name,
+        email: user.email,
+        contact: `+91${user?.phone_number}`,
+      },
+      theme: { color: "#3399cc" },
+    };
+
+    const razorpay = new window.Razorpay(options);
+    razorpay.on("payment.failed", () =>
+      toast.error("Payment failed. Please try again.")
+    );
+    razorpay.open();
   };
 
   return (
@@ -154,7 +223,7 @@ const PageOne = () => {
           </div>
         )}
 
-        {step === 2 && !isPayed && (
+        {step === 2 && (
           <form
             className="w-full max-w-lg space-y-6 mt-8 p-6 bg-white rounded-lg shadow-lg"
             onSubmit={handleSubmit}>
@@ -162,7 +231,7 @@ const PageOne = () => {
               <label
                 htmlFor="mobile"
                 className="block mb-2 text-lg font-medium text-gray-700">
-                Mobile Number (Aadhaar linked){" "}
+                Mobile Number (Aadhaar linked)
                 <span className="text-red-500">*</span>
               </label>
               <input
@@ -196,59 +265,46 @@ const PageOne = () => {
               </select>
             </div>
 
-            <div className="space-y-4">
-              {[
-                {
-                  label: "Aadhaar Card Front",
-                  key: "aadhaarFront",
-                  icon: FaIdCard,
-                },
-                {
-                  label: "Aadhaar Card Back",
-                  key: "aadhaarBack",
-                  icon: FaFileAlt,
-                },
-                { label: "Signature", key: "signature", icon: FaSignature },
-              ].map(({ label, key, icon: Icon }) => (
-                <div key={key} className="flex items-center space-x-4">
-                  <Icon size={24} className="text-gray-500" />
-                  <label htmlFor={key} className="flex-1 text-lg text-gray-700">
-                    {label}
+            <div>
+              {["aadhaarFront", "aadhaarBack", "signature"].map((key) => (
+                <div key={key}>
+                  <label className="block mb-2 text-lg font-medium text-gray-700">
+                    {key
+                      .replace(/([A-Z])/g, " $1")
+                      .replace("aadhaar", "Aadhaar")}
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
-                    id={key}
                     type="file"
-                    className="w-40 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-3 border border-gray-300 rounded-lg"
                     onChange={(e) => handleFileUpload(e, key)}
-                    accept=".jpg,.png,.pdf"
-                    required={key !== "qualification"} // Make all fields required except qualification
+                    required
                   />
                 </div>
               ))}
             </div>
 
-            {/* Display the price */}
             <div className="text-center text-lg font-semibold text-gray-800 mt-4">
               <p>
-                Total Price: <span className="text-blue-500">₹1000</span>
+                Total Price: <span className="text-blue-500">₹{price}</span>
               </p>
             </div>
 
-            <button
-              type="submit"
-              className="w-full py-3 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out"
-              onClick={() => initializeRazorpay(1000, "Learning License")}>
-              Proceed to Payment
-            </button>
+            {isPayed ? (
+              <button
+                onClick={handleSubmit}
+                className="w-full py-3 text-white bg-green-500 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
+                Submit
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="w-full py-3 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out"
+                onClick={() => initializeRazorpay(price, "Learning License")}>
+                Proceed to Payment
+              </button>
+            )}
           </form>
-        )}
-
-        {isPayed && (
-          <button
-            onClick={handleSubmit}
-            className="w-full py-3 text-white bg-green-500 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
-            Submit
-          </button>
         )}
       </div>
     </>

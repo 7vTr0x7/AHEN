@@ -41,7 +41,7 @@ const CourseInfo = ({ course }) => {
     try {
       const response = await fetch(
         `https://driving.shellcode.cloud/api/${
-          isInWishlist ? "remove-course-from-wishlist" : "wishlist"
+          isInWishlist ? "wishlist/remove-course-from-wishlist" : "wishlist"
         }`,
         {
           method: isInWishlist ? "DELETE" : "POST",
@@ -79,7 +79,7 @@ const CourseInfo = ({ course }) => {
           <div className="flex items-center gap-1 text-sm text-gray-500">
             <FaStar className="text-yellow-500" />
             <span>{course?.starRating}</span>
-            <span>({course?.reviews.length} ratings)</span>
+            <span>({course?.reviews?.length} ratings)</span>
           </div>
           <FaHeart
             className={`text-xl cursor-pointer ${
