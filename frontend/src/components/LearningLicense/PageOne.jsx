@@ -130,7 +130,6 @@ const PageOne = () => {
       );
 
       const responseData = await response.json();
-      console.log(responseData);
       if (response.ok && responseData.success) {
         toast.success(responseData.message);
         navigate("/"); // Navigate to home after success
