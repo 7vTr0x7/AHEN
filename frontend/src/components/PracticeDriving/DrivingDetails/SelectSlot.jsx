@@ -75,7 +75,7 @@ const SelectSlot = ({ handleClose, car }) => {
         booking_date: new Date().toISOString().split("T")[0],
         slot_date: slotDate,
         slot_time: selectedTimeSlot,
-        status: "confirmed",
+        status: "pending",
         amount: car.price.replace("₹", "") * selectedDuration,
         hours: selectedDuration,
       };
