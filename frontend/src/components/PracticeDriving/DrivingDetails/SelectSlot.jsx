@@ -68,7 +68,7 @@ const SelectSlot = ({ handleClose, car }) => {
 
   const createSession = async (slotDate) => {
     try {
-      const tokenData = JSON.parse(localStorage.getItem("token"));
+      const token = JSON.parse(localStorage.getItem("token"));
 
       const requestBody = {
         practisedrivingid: car.id,
@@ -86,7 +86,7 @@ const SelectSlot = ({ handleClose, car }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenData.value}`,
+          Authorization: `Bearer ${token.value}`,
         },
         credentials: "include",
         body: JSON.stringify(requestBody),
