@@ -102,6 +102,8 @@ const PageOne = () => {
     formDataObj.append("vehicle_type", vehicleType);
     formDataObj.append("mobile_number", mobileNumber);
     formDataObj.append("qualification", qualification || "");
+    formDataObj.append("vendor_id", "1");
+    
     formDataObj.append(
       "aadhar_front_photo",
       uploads.aadhaarFront,
