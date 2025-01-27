@@ -81,7 +81,6 @@ const SelectSlot = ({ handleClose, car }) => {
       };
 
       const apiEndpoint = "https://driving.shellcode.cloud/api/create-booking";
-
       const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: {
