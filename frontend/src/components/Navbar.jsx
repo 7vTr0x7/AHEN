@@ -13,6 +13,8 @@ import { toggleOpenUserLogin } from "../redux/slices/userSlice";
 import { getToken } from "../../utils/constants";
 import toast from "react-hot-toast";
 
+import ahenLogo from "../assets/images/ahenLogo.png";
+
 const Navbar = () => {
   const [error, setError] = useState("");
   const [user, setUser] = useState(null);
@@ -132,9 +134,11 @@ const Navbar = () => {
       <div className="bg-[#F3F4F6] relative z-50 shadow-md px-4 py-4 flex items-center justify-between sm:px-12 md:px-24 select-none">
         <div className="flex items-center gap-4 sm:gap-12">
           <div
-            className="bg-black px-4 py-2 text-white font-semibold rounded-md text-sm sm:text-base cursor-pointer"
+            className=" px-4 py-2 flex items-center  text-black font-semibold rounded-md text-2xl sm:text-base cursor-pointer"
             onClick={() => navigate("/")}>
-            Ahen
+            <img alt="logo" src={ahenLogo} className="h-10 w-10" />
+            <p className="text-2xl font-light">hen
+            </p>
           </div>
           {token && (
             <div className="flex flex-col items-end ">
